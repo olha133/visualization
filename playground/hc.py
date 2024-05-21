@@ -3,6 +3,7 @@ import numpy as np
 import time
 import pandas as pd
 import os
+import glob
 import networkx as nx
 import matplotlib.pyplot as plt
 from scipy.spatial.distance import pdist, squareform
@@ -14,6 +15,7 @@ class HillClimbingTSP:
         self.positions, self.distance_matrix = self.generate_distance_matrix()
         self.random_seed = int(time.time())
         random.seed(self.random_seed)
+        self.plot_counter = 0
 
     def generate_distance_matrix(self):
         # If CSV file exists, read it. Otherwise, generate random positions and calculate the distance matrix
@@ -55,8 +57,11 @@ class HillClimbingTSP:
         if swapped_nodes:
             nx.draw_networkx_nodes(G, pos, nodelist=swapped_nodes, node_color='#E6EB00', node_size=350)
         
-        plt.pause(2)
-        
+        # Save the plot
+        plot_filename = f'plots/plot_{self.plot_counter}.png'
+        plt.savefig(plot_filename, dpi=500)
+        self.plot_counter += 1
+                
     def generate_complete_graph(self):
         G = nx.Graph()
         n = len(self.distance_matrix)
@@ -74,10 +79,8 @@ class HillClimbingTSP:
         # Create a graph and visualize it
         G = self.generate_complete_graph()
         positions = {i: pos for i, pos in enumerate(self.positions)}
-        
-        plt.ion()
-        
-        # self.plot_graph_step(G, positions, tour)
+               
+        self.plot_graph_step(G, positions, tour)
 
         while True:
             neighbors = self.get_neighbors(tour)
@@ -101,16 +104,18 @@ class HillClimbingTSP:
                     swapped_nodes = [tour[i-1], tour[i], tour[i+1], tour[i+2]]
                     break
          
-            # self.plot_graph_step(G, positions, tour, swapped_edges=swapped_edges, swapped_nodes=swapped_nodes)
+            self.plot_graph_step(G, positions, tour, swapped_edges=swapped_edges, swapped_nodes=swapped_nodes)
+            self.plot_graph_step(G, positions, tour)
 
-        # self.plot_graph_step(G, positions, tour)
-        plt.ioff()
+        self.plot_graph_step(G, positions, tour)
         return tour, self.total_distance(tour)
 
 
 def main():
     num_cities = 5
-
+    files = glob.glob('plots/*')
+    for f in files:
+        os.remove(f)
     tsp = HillClimbingTSP(num_cities, r'C:\Users\Olha\study\Bachalor\code\my code\tour15.csv')
     best_tour, best_distance = tsp.run()
     print(f"Best tour: {best_tour}")
