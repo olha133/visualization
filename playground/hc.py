@@ -3,12 +3,12 @@ import numpy as np
 import time
 import pandas as pd
 import os
-import glob
 import networkx as nx
 import matplotlib.pyplot as plt
 from scipy.spatial.distance import pdist, squareform
+from django.conf import settings
 
-class HillClimbingTSP:
+class HillClimbing:
     def __init__(self, num_cities=5, csv_file=None):
         self.num_cities = num_cities
         self.csv_file = csv_file
@@ -58,8 +58,12 @@ class HillClimbingTSP:
             nx.draw_networkx_nodes(G, pos, nodelist=swapped_nodes, node_color='#E6EB00', node_size=350)
         
         # Save the plot
-        plot_filename = f'plots/plot_{self.plot_counter}.png'
+        plot_dir = os.path.join(settings.MEDIA_ROOT, 'plots')
+        if not os.path.exists(plot_dir):
+            os.makedirs(plot_dir)
+        plot_filename = os.path.join(plot_dir, f'plot_{self.plot_counter}.png')
         plt.savefig(plot_filename, dpi=500)
+        
         self.plot_counter += 1
                 
     def generate_complete_graph(self):
@@ -109,18 +113,3 @@ class HillClimbingTSP:
 
         self.plot_graph_step(G, positions, tour)
         return tour, self.total_distance(tour)
-
-
-def main():
-    num_cities = 5
-    files = glob.glob('plots/*')
-    for f in files:
-        os.remove(f)
-    tsp = HillClimbingTSP(num_cities, r'C:\Users\Olha\study\Bachalor\code\my code\tour15.csv')
-    best_tour, best_distance = tsp.run()
-    print(f"Best tour: {best_tour}")
-    print(f"Best distance: {best_distance}")
-
-
-if __name__ == "__main__":
-    main()
