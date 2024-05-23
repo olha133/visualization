@@ -14,8 +14,14 @@ body {
 
 .rotating .image{
     position: absolute;
-    /* width: 300px; */
+    width: 300px;
 }
 .plot-image {
     width: 400px;
+    animation: loop 10s linear infinite;
+}
+@keyframes rotate {
+    10%  {opacity: 0;}
+    15%  {opacity: 1;}
+    100% {opacity: 1;}
 }

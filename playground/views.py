@@ -5,7 +5,13 @@ import random
 from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import render
+import re
 # Create your views here.
+
+# Sorting function
+def extract_number(string):
+    match = re.search(r'plot_(\d+).png', string)
+    return int(match.group(1)) if match else -1
 
 def hc(request):
     context = dict()
@@ -24,11 +30,13 @@ def hc(request):
     distance = 0.5
 
     # Gather plot file paths
-    plot_files = sorted([
+    plot_files = [
         os.path.join(settings.MEDIA_URL, 'plots', file).replace('\\', '/')
         for file in os.listdir(plots_dir)
         if file.endswith('.png')
-    ])
+    ]
+    plot_files = sorted(plot_files, key=extract_number)
+    # print(type(plot_files))
 
     context.update({
         'tour': tour,
