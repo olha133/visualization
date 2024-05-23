@@ -1,16 +1,32 @@
 {% extends 'main.html' %}
+{% load static %}
 {% block content%}
-<h1>Hill Climbing Algorithm Visualization</h1>
+<!DOCTYPE html>
+<html lang="en">
 
-<div id="result">
-    <h2>Best Tour: <span id="tour">{{ tour|join:' -> ' }}</span></h2>
-    <h2>Best Distance: <span id="distance">{{ distance }}</span></h2>
-    <div id="plots">
-        {% for plot_file in plot_files %}
-        <img src="{{ plot_file }}" alt="Plot">
-        {% endfor %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
+<body>
+
+    <div id="result">
+        <h2>Best Tour: <span id="tour">{{ tour|join:' -> ' }}</span></h2>
+        <h2>Best Distance: <span id="distance">{{ distance }}</span></h2>
+        <div id="plots">
+            <ul class="rotating">
+                {% for plot_file in plot_files %}
+                <li class="image"><img src="{{ plot_file }}" alt="Plot" class="plot-image"></li>
+                {% endfor %}
+            </ul>
+        </div>
     </div>
-</div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</body>
+
+</html>
 {% endblock content %}

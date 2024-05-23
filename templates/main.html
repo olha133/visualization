@@ -8,16 +8,8 @@
     <!-- <link rel='stylesheet' type='text/css' media='screen' href='main.css'> -->
 </head>
 <body>
+    {% include 'navbar.html' %}
     {% block content %}
-    <div>
-        <div>
-            {% for alg in algorithms %}
-            <div>
-                <a href="/{{alg.key}}"><h5>{{alg.name}}</h5></a>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
     {% endblock %}
 
 </body>

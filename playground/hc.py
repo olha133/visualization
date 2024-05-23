@@ -4,6 +4,8 @@ import time
 import pandas as pd
 import os
 import networkx as nx
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from scipy.spatial.distance import pdist, squareform
 from django.conf import settings

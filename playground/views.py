@@ -7,34 +7,35 @@ from django.http import JsonResponse
 from django.shortcuts import render
 # Create your views here.
 
-algorithms = [
-    {"key": "", "name": "Hill climber"},
-    {"key": "hc_restarts", "name" : "Hill climber with restarts"},
-    {"key": "hc_larger_radii", "name" : "Hill climber with larger search radii"}
-]
 def hc(request):
-    context = {'algorithms': algorithms}
+    context = dict()
         
     # Clean up old plot files
     plots_dir = os.path.join(settings.MEDIA_ROOT, 'plots')
-    for file in os.listdir(plots_dir):
-        file_path = os.path.join(plots_dir, file)
-        if os.path.isfile(file_path):
-            os.unlink(file_path)
+    # for file in os.listdir(plots_dir):
+    #     file_path = os.path.join(plots_dir, file)
+    #     if os.path.isfile(file_path):
+    #         os.unlink(file_path)
             
-    num_cities = random.randint(5, 20)
-    hc = HillClimbing(num_cities)
-    tour, distance = hc.run()
+    # num_cities = random.randint(5, 20)
+    # hc = HillClimbing(num_cities)
+    # tour, distance = hc.run()
+    tour = [1,2,3,4]
+    distance = 0.5
 
     # Gather plot file paths
-    plot_files = sorted([os.path.join(settings.MEDIA_URL, 'plots', file) for file in os.listdir(plots_dir) if file.endswith('.png')])
-
+    plot_files = sorted([
+        os.path.join(settings.MEDIA_URL, 'plots', file).replace('\\', '/')
+        for file in os.listdir(plots_dir)
+        if file.endswith('.png')
+    ])
 
     context.update({
         'tour': tour,
         'distance': distance,
         'plot_files': plot_files
     })
+    # print(context['plot_files'])
 
     return render(request, 'playground/hc.html', context)
 # def hc(request):
