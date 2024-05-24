@@ -14,14 +14,13 @@
 
 <body>
     <div id="controls">
-        <h2>Locations</h2>
+        <h2>Maps</h2>
         <input type="radio" id="predefined" name="location" value="predefined" checked>
         <label for="predefined">PRE-DEFINED</label>
         <input type="radio" id="custom" name="location" value="custom">
         <label for="custom">CUSTOM</label>
     
         <div id="predefined-options">
-            <h3>Pre-defined maps</h3>
             <label>City count:</label>
             <input type="radio" name="city-count" value="5"> 5 cities
             <input type="radio" name="city-count" value="10"> 10 cities
@@ -30,12 +29,12 @@
         </div>
     
         <div id="custom-options" style="display: none;">
-            <h3>Custom map</h3>
             <label for="myfile">Select a file:</label>
             <input type="file" id="custom-file" name="custom_file" accept=".csv, text/csv"/>
         </div>
-        <button id="start-button">Start</button>
         <div id="error-message" style="color: red; display: none;"></div>
+        <button id="replay-button" style="display: none;">Replay</button>
+        <button id="start-button">Start</button>
     </div>
     <div id="result" style="display: none;">
         <h2>Best Tour: <span id="tour"></span></h2>
@@ -48,12 +47,36 @@
     </div>
 
     <script>
+        function startVisualization(plotFiles) {
+            $('#tour').text(plotFiles.tour.join(' -> '));
+            $('#distance').text(plotFiles.distance);
+            $('.rotating').empty();
+            plotFiles.plot_files.forEach(function(plot_file, index) {
+                let timestamp = new Date().getTime();
+                let plot_url = plot_file + '?t=' + timestamp;
+                $('.rotating').append('<li class="image"><img src="' + plot_url + '" alt="Plot" class="plot-image"></li>');
+            });
+
+            let numberOfImages = plotFiles.plot_files.length;
+            let totalDuration = numberOfImages * 1; 
+
+            $('.rotating .image').each(function(index) {
+                $(this).css('animation', `rotate ${totalDuration}s forwards linear`);
+                $(this).css('animation-delay', `${index * 1}s`);
+            });
+
+            $('#result').show();
+        }
+
         $(document).ready(function() {
+            let plotFiles;
+
             $('input[name="location"]').change(function() {
                 if (this.value === 'predefined') {
                     $('#predefined-options').show();
                     $('#custom-options').hide();
                     $('#custom-file').val('');
+                    $('#error-message').hide();
                 } else {
                     $('#predefined-options').hide();
                     $('#custom-options').show();
@@ -62,8 +85,10 @@
             $('#custom-file').change(function(e) {
                 var ext = this.value.match(/\.([^\.]+)$/)[1];
                 if (ext !== 'csv') {
-                    alert('Not allowed. Please upload a CSV file.');
+                    $('#error-message').text('Not allowed. Please upload a CSV file.').show();
                     this.value = '';
+                } else {
+                    $('#error-message').hide();
                 }
             });
             $('#start-button').click(function() {
@@ -76,7 +101,7 @@
                 } else if (selectedCityCount) {
                     formData.append('city_count', selectedCityCount);
                 } else {
-                    alert('Please select the number of cities or upload a custom map.');
+                    $('#error-message').text('Please select the number of cities or upload a custom map.').show();
                     return;
                 }
 
@@ -90,30 +115,20 @@
                     contentType: false,
                     success: function(response) {
                         $('#error-message').text('').hide();
-                        $('#tour').text(response.tour.join(' -> '));
-                        $('#distance').text(response.distance);
-                        $('.rotating').empty();
-                        response.plot_files.forEach(function(plot_file, index) {
-                            let timestamp = new Date().getTime();
-                            let plot_url = plot_file + '?t=' + timestamp;
-                            $('.rotating').append('<li class="image"><img src="' + plot_url + '" alt="Plot" class="plot-image"></li>');
-                        });
-
-                        let numberOfImages = response.plot_files.length;
-                        let totalDuration = numberOfImages * 1; // 3 seconds per image
-
-                        $('.rotating .image').each(function(index) {
-                            $(this).css('animation', `rotate ${totalDuration}s forwards linear`);
-                            $(this).css('animation-delay', `${index * 1}s`);
-                        });
-
-                        $('#result').show();
+                        plotFiles = response;
+                        startVisualization(plotFiles);
+                        $('#replay-button').show();
                     },
                     error: function(xhr, status, error) {
                         let errorMessage = xhr.responseJSON.error;
                         $('#error-message').text(errorMessage).show();
                     }
                 });
+            });
+            $('#replay-button').click(function() {
+                if (plotFiles) {
+                    startVisualization(plotFiles);
+                }
             });
         });
     </script>

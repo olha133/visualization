@@ -113,5 +113,4 @@ class HillClimbing:
             self.plot_graph_step(G, positions, tour, swapped_edges=swapped_edges, swapped_nodes=swapped_nodes)
             self.plot_graph_step(G, positions, tour)
 
-        self.plot_graph_step(G, positions, tour)
         return tour, self.total_distance(tour)
