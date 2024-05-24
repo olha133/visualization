@@ -6,6 +6,7 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import render
 import re
+import csv
 # Create your views here.
 
 # Sorting function
@@ -15,9 +16,16 @@ def extract_number(string):
 
 def hc(request):
     if request.method == 'POST':
-        num_cities = int(request.POST.get('city_count'))
-        filename = f'tour{num_cities}.csv'
-        filepath = os.path.join(settings.BASE_DIR, 'data', 'maps', filename)
+        if 'custom_file' in request.FILES:
+            uploaded_file = request.FILES['custom_file']
+            filepath = os.path.join(settings.BASE_DIR, 'data', 'custom_maps', uploaded_file.name)
+            with open(filepath, 'wb+') as destination:
+                for chunk in uploaded_file.chunks():
+                    destination.write(chunk)
+        else:
+            num_cities = int(request.POST.get('city_count'))
+            filename = f'tour{num_cities}.csv'
+            filepath = os.path.join(settings.BASE_DIR, 'data', 'defined_maps', filename)
         print(filepath)
         context = dict()
             
@@ -28,7 +36,7 @@ def hc(request):
             if os.path.isfile(file_path):
                 os.unlink(file_path)
                 
-        hc = HillClimbing(num_cities, filepath)
+        hc = HillClimbing(csv_file = filepath)
         tour, distance = hc.run()
 
         # Gather plot file paths
@@ -49,8 +57,7 @@ def hc(request):
         return JsonResponse(context)
     else:
         return render(request, 'playground/hc.html')
-# def hc(request):
-#     return render(request, "playground/hc.html", {"algorithms": algorithms})
+
 
 def hc_restarts(request):
     return render(request, "playground/hc_restarts.html")
