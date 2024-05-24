@@ -14,18 +14,26 @@
 
 <body>
     <div id="controls">
-        <h2>TSP parameters</h2>
-        <h3>Pre-defined maps</h3>
-        <label>City count:</label>
-        <input type="radio" name="city-count" value="5"> 5 cities
-        <input type="radio" name="city-count" value="10"> 10 cities
-        <input type="radio" name="city-count" value="15"> 15 cities
-        <input type="radio" name="city-count" value="20"> 20 cities
-        <br>
-        <h3>Custom map</h3>
-        <label for="myfile">Select a file:</label>
-        <input type="file" id="custom-file" name="custom_file" accept=".csv, text/csv"/>
-        <br>
+        <h2>Locations</h2>
+        <input type="radio" id="predefined" name="location" value="predefined" checked>
+        <label for="predefined">PRE-DEFINED</label>
+        <input type="radio" id="custom" name="location" value="custom">
+        <label for="custom">CUSTOM</label>
+    
+        <div id="predefined-options">
+            <h3>Pre-defined maps</h3>
+            <label>City count:</label>
+            <input type="radio" name="city-count" value="5"> 5 cities
+            <input type="radio" name="city-count" value="10"> 10 cities
+            <input type="radio" name="city-count" value="15"> 15 cities
+            <input type="radio" name="city-count" value="20"> 20 cities
+        </div>
+    
+        <div id="custom-options" style="display: none;">
+            <h3>Custom map</h3>
+            <label for="myfile">Select a file:</label>
+            <input type="file" id="custom-file" name="custom_file" accept=".csv, text/csv"/>
+        </div>
         <button id="start-button">Start</button>
         <div id="error-message" style="color: red; display: none;"></div>
     </div>
@@ -41,6 +49,16 @@
 
     <script>
         $(document).ready(function() {
+            $('input[name="location"]').change(function() {
+                if (this.value === 'predefined') {
+                    $('#predefined-options').show();
+                    $('#custom-options').hide();
+                    $('#custom-file').val('');
+                } else {
+                    $('#predefined-options').hide();
+                    $('#custom-options').show();
+                }
+            });
             $('#custom-file').change(function(e) {
                 var ext = this.value.match(/\.([^\.]+)$/)[1];
                 if (ext !== 'csv') {
