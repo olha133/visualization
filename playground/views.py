@@ -16,6 +16,9 @@ def extract_number(string):
 def hc(request):
     if request.method == 'POST':
         num_cities = int(request.POST.get('city_count'))
+        filename = f'tour{num_cities}.csv'
+        filepath = os.path.join(settings.BASE_DIR, 'data', 'maps', filename)
+        print(filepath)
         context = dict()
             
         # Clean up old plot files
@@ -25,7 +28,7 @@ def hc(request):
             if os.path.isfile(file_path):
                 os.unlink(file_path)
                 
-        hc = HillClimbing(num_cities)
+        hc = HillClimbing(num_cities, filepath)
         tour, distance = hc.run()
 
         # Gather plot file paths
