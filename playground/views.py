@@ -14,6 +14,16 @@ def extract_number(string):
     match = re.search(r'plot_(\d+).png', string)
     return int(match.group(1)) if match else -1
 
+def validate_csv(file_path):
+    with open(file_path, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        rows = list(reader)
+        if len(rows) < 4:
+            return False, "The file must have at least 4 rows."
+        if len(rows[0]) != 2:
+            return False, "The file must have exactly 2 columns for X and Y coordinates."
+    return True, None
+
 def hc(request):
     if request.method == 'POST':
         if 'custom_file' in request.FILES:
@@ -22,11 +32,14 @@ def hc(request):
             with open(filepath, 'wb+') as destination:
                 for chunk in uploaded_file.chunks():
                     destination.write(chunk)
+            is_valid, error_message = validate_csv(filepath)
+            if not is_valid:
+                return JsonResponse({'error': error_message}, status=400)
         else:
             num_cities = int(request.POST.get('city_count'))
             filename = f'tour{num_cities}.csv'
             filepath = os.path.join(settings.BASE_DIR, 'data', 'defined_maps', filename)
-        print(filepath)
+        # print(filepath)
         context = dict()
             
         # Clean up old plot files

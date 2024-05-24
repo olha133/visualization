@@ -71,6 +71,7 @@
                     processData: false,
                     contentType: false,
                     success: function(response) {
+                        $('#error-message').text('').hide();
                         $('#tour').text(response.tour.join(' -> '));
                         $('#distance').text(response.distance);
                         $('.rotating').empty();

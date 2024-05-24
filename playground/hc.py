@@ -22,7 +22,7 @@ class HillClimbing:
     def generate_distance_matrix(self):
         # If CSV file exists, read it. Otherwise, generate random positions and calculate the distance matrix
         if self.csv_file and os.path.exists(self.csv_file):
-            data = pd.read_csv(self.csv_file, header=None).values
+            data = pd.read_csv(self.csv_file, header=0).values
             positions = data[:, :2]
             distance_matrix = squareform(pdist(positions, 'euclidean'))
             self.num_cities = len(distance_matrix)
