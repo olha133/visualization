@@ -108,7 +108,7 @@
                 formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
 
                 $.ajax({
-                    url: '{% url "hc" %}', // Assuming your URL name for the hc view is "hc"
+                    url: '{% url "hc" %}',
                     method: 'POST',
                     data: formData,
                     processData: false,
