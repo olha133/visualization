@@ -87,6 +87,9 @@ class HillClimbing:
         G = self.generate_complete_graph()
         positions = {i: pos for i, pos in enumerate(self.positions)}
                
+        tours = [[node + 1 for node in tour]]
+        swapped_nodes_list = []     
+          
         self.plot_graph_step(G, positions, tour)
 
         while True:
@@ -104,17 +107,22 @@ class HillClimbing:
             tour = neighbors[np.argmin(neighbors_distances)]
              # Find the swapped cities
             swapped_edges = []
+            swapped_edge_nodes = []
             swapped_nodes = []
             for i in range(len(tour) - 1):
                 if old_tour[i] != tour[i]:
                     swapped_edges = [(tour[i-1], tour[i]), (tour[i+1], tour[i + 2])]
-                    swapped_nodes = [tour[i-1], tour[i], tour[i+1], tour[i+2]]
+                    swapped_edge_nodes = [tour[i-1], tour[i], tour[i+1], tour[i+2]]
+                    swapped_nodes = [i-1, i, i+1, i+2]
                     break
-         
-            self.plot_graph_step(G, positions, tour, swapped_edges=swapped_edges, swapped_nodes=swapped_nodes)
+            
+            swapped_nodes_list.append(swapped_nodes)
+            tours.append([node + 1 for node in tour])
+            self.plot_graph_step(G, positions, tour, swapped_edges=swapped_edges, swapped_nodes=swapped_edge_nodes)
             self.plot_graph_step(G, positions, tour)
         
         end_time = time.time()  # End timing
         elapsed_time = end_time - start_time
-        
-        return tour, self.total_distance(tour), elapsed_time
+        print(tours)
+        print(swapped_nodes_list)
+        return tours, swapped_nodes_list, self.total_distance(tour), elapsed_time

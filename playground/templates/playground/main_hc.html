@@ -58,8 +58,8 @@
         <div id="waiting-message">Please wait while the visualization is being generated...</div>
     </div>
     <div id="result" style="display: none;">
-        <h2>Best Tour: <span id="tour"></span></h2>
-        <h2>Best Distance: <span id="distance"></span></h2>
+        <h2>Tour: <span id="tours"></span></h2>
+        <h2>Distance: <span id="distance"></span></h2>
         <h2>Time: <span id="elapsed-time"></span></h2>
         <div id="plots">
             <ul class="rotating">
@@ -68,19 +68,27 @@
         </div>
     </div>
     <script>
-        function startVisualization(plotFiles) {
+        function highlightTour(tour, swappedNodes) {
+            let tourHtml = tour.map((node, index) => {
+                let color = (swappedNodes && swappedNodes.includes(index)) ? '#E6EB00' : '#65B48E';
+                return `<span style="background:${color}; border-radius: 50%;">${node}</span>`;
+            }).join('-');
+            $('#tours').html(tourHtml);
+        }   
+        
+        function startVisualization(data) {
             $('#waiting-message').hide();
-            $('#tour').text(plotFiles.tour.join(' -> '));
-            $('#distance').text(plotFiles.distance);
-            $('#elapsed-time').text(plotFiles.elapsed_time.toFixed(2) + ' seconds');
+            $('#distance').text(data.distance);
+            $('#elapsed-time').text(data.elapsed_time.toFixed(2) + ' seconds');
             $('.rotating').empty();
-            plotFiles.plot_files.forEach(function(plot_file, index) {
+
+            data.plot_files.forEach(function(plot_file, index) {
                 let timestamp = new Date().getTime();
                 let plot_url = plot_file + '?t=' + timestamp;
                 $('.rotating').append('<li class="image"><img src="' + plot_url + '" alt="Plot" class="plot-image"></li>');
             });
 
-            let numberOfImages = plotFiles.plot_files.length;
+            let numberOfImages = data.plot_files.length;
             let totalDuration = numberOfImages * 1; 
 
             $('.rotating .image').each(function(index) {
@@ -88,7 +96,17 @@
                 $(this).css('animation-delay', `${index * 1}s`);
             });
 
+            let tourIndex = 0;
+            function displayNextTour() {
+                if (tourIndex < data.tours.length) {
+                    highlightTour(data.tours[tourIndex], data.swapped_nodes_list[tourIndex] || []);
+                    tourIndex++;
+                    setTimeout(displayNextTour, 2300); // Adjust the interval as needed
+                }
+            }
+            
             $('#result').show();
+            displayNextTour();
         }
 
         $(document).ready(function() {

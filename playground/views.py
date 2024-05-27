@@ -69,10 +69,16 @@ def run_algorithm(algorithm_class, request):
         algorithm = algorithm_class(csv_file=filepath, num_runs=iterations)
     else:
         algorithm = algorithm_class(csv_file=filepath)
-    tour, distance, elapsed_time = algorithm.run()
+    tours, swapped_nodes_list, distance, elapsed_time = algorithm.run()
     plot_files = get_plot_files()
     
-    return JsonResponse({'tour': tour, 'distance': distance, 'plot_files': plot_files, 'elapsed_time': elapsed_time})
+    return JsonResponse({
+        'tours': tours,
+        'swapped_nodes_list': swapped_nodes_list,
+        'distance': distance,
+        'plot_files': plot_files,
+        'elapsed_time': elapsed_time
+    })
 
 def hc(request):
     if request.method == 'POST':
