@@ -42,7 +42,7 @@ class HillClimbing:
             neighbors.append(new_tour)
         return neighbors
     
-    def plot_graph_step(self, G, positions, tour=None, swapped_edges=None, swapped_nodes=None):
+    def plot_graph_step(self, G, positions, tour=None, edge_colors='#3E5CC5', node_colors='#65B48E',swapped_edges=None, swapped_nodes=None):
         plt.clf()
         pos = {i: (positions[i][0], positions[i][1]) for i in range(len(positions))}
         
@@ -51,7 +51,7 @@ class HillClimbing:
         path_edges_background = list(G.edges)
         nx.draw(G, pos, with_labels=False, edgelist=path_edges_background, edge_color='#dbdbdb', width=1.5)
         labels = {i: i + 1 for i in G.nodes()}
-        nx.draw(G, pos, labels=labels, node_color='#65B48E', node_size=350, font_size=10, edgelist=path_edges, edge_color='#3E5CC5', width=2)
+        nx.draw(G, pos, labels=labels, node_color=node_colors, node_size=350, font_size=10, edgelist=path_edges, edge_color=edge_colors, width=2)
 
         if swapped_edges:
             nx.draw_networkx_edges(G, pos, edgelist=swapped_edges, edge_color='#E64E00', width=2)
@@ -83,13 +83,15 @@ class HillClimbing:
         tour = list(range(self.num_cities))
         random.shuffle(tour)
         tour.append(tour[0])
+        
         # Create a graph and visualize it
         G = self.generate_complete_graph()
         positions = {i: pos for i, pos in enumerate(self.positions)}
                
         tours = [[node + 1 for node in tour]]
         swapped_nodes_list = []     
-          
+        distances = []
+        
         self.plot_graph_step(G, positions, tour)
 
         while True:
@@ -97,6 +99,8 @@ class HillClimbing:
             current_distance = self.total_distance(tour)
             neighbors_distances = [self.total_distance(neighbor) for neighbor in neighbors]
 
+            distances.append(current_distance)
+            
             # If there's no improvement, break the loop
             if min(neighbors_distances) >= current_distance:
                 break
@@ -118,11 +122,12 @@ class HillClimbing:
             
             swapped_nodes_list.append(swapped_nodes)
             tours.append([node + 1 for node in tour])
+            
             self.plot_graph_step(G, positions, tour, swapped_edges=swapped_edges, swapped_nodes=swapped_edge_nodes)
             self.plot_graph_step(G, positions, tour)
         
         end_time = time.time()  # End timing
         elapsed_time = end_time - start_time
-        print(tours)
-        print(swapped_nodes_list)
-        return tours, swapped_nodes_list, self.total_distance(tour), elapsed_time
+        self.plot_graph_step(G, positions, tour, edge_colors='#E64E00', node_colors='#f05100')
+
+        return tours, swapped_nodes_list, distances, elapsed_time

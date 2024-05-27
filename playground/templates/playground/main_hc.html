@@ -59,7 +59,7 @@
     </div>
     <div id="result" style="display: none;">
         <h2>Tour: <span id="tours"></span></h2>
-        <h2>Distance: <span id="distance"></span></h2>
+        <h2>Distance: <span id="distances"></span></h2>
         <h2>Time: <span id="elapsed-time"></span></h2>
         <div id="plots">
             <ul class="rotating">
@@ -68,9 +68,13 @@
         </div>
     </div>
     <script>
-        function highlightTour(tour, swappedNodes) {
+        function waitOneSecond() {
+            return new Promise(resolve => setTimeout(resolve, 1000));
+        }
+
+        function highlightTour(tour, swappedNodes, backgroundColor = '#65B48E') {
             let tourHtml = tour.map((node, index) => {
-                let color = (swappedNodes && swappedNodes.includes(index)) ? '#E6EB00' : '#65B48E';
+                let color = (swappedNodes && swappedNodes.includes(index)) ? '#E6EB00' : backgroundColor;
                 return `<span style="background:${color}; border-radius: 50%;">${node}</span>`;
             }).join('-');
             $('#tours').html(tourHtml);
@@ -78,7 +82,7 @@
         
         function startVisualization(data) {
             $('#waiting-message').hide();
-            $('#distance').text(data.distance);
+            $('#distances').text(data.distances);
             $('#elapsed-time').text(data.elapsed_time.toFixed(2) + ' seconds');
             $('.rotating').empty();
 
@@ -96,17 +100,40 @@
                 $(this).css('animation-delay', `${index * 1}s`);
             });
 
-            let tourIndex = 0;
-            function displayNextTour() {
-                if (tourIndex < data.tours.length) {
-                    highlightTour(data.tours[tourIndex], data.swapped_nodes_list[tourIndex] || []);
-                    tourIndex++;
-                    setTimeout(displayNextTour, 2300); // Adjust the interval as needed
+            async function displayNextTour(data, tourIndex) {
+                if (tourIndex < data.tours.length - 1 ) {
+                    if( data.swapped_nodes_list == null){
+                        highlightTour(data.tours[tourIndex], null);
+                        $('#distances').text(data.distances[tourIndex].toFixed(2));
+                        tourIndex++;
+                        setTimeout(() => displayNextTour(data, tourIndex), 1000);
+                    }
+                    else{
+                        highlightTour(data.tours[tourIndex], null); // Initial tour highlight
+                        $('#distances').text(data.distances[tourIndex].toFixed(2));
+                        await waitOneSecond(); // Wait for 1 second
+
+                        highlightTour(data.tours[tourIndex], data.swapped_nodes_list[tourIndex] || []); // Highlight swapped nodes
+                        tourIndex++;
+                        setTimeout(() => displayNextTour(data, tourIndex), 1000);
+                    }
+                }
+                else{
+                    if( data.swapped_nodes_list == null){
+                        highlightTour(data.tours[tourIndex], null, '#E64E00');
+                        $('#distances').text(data.distances[tourIndex].toFixed(2));
+                    }
+                    else{
+                        $('#distances').text(data.distances[tourIndex].toFixed(2));
+                        await waitOneSecond();
+                        highlightTour(data.tours[tourIndex], null, '#E64E00');
+                        
+                    }
                 }
             }
             
             $('#result').show();
-            displayNextTour();
+            displayNextTour(data, 0);
         }
 
         $(document).ready(function() {

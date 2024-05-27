@@ -81,6 +81,8 @@ class HillClimbingRestarts:
         start_time = time.time()
         best_tour = None
         best_distance = float('inf')
+        tours = []
+        distances = []
         for _ in range(self.num_runs):
             # Generate a random initial tour
             tour = list(range(self.num_cities))
@@ -89,9 +91,7 @@ class HillClimbingRestarts:
             # Create a graph and visualize it
             G = self.generate_complete_graph()
             positions = {i: pos for i, pos in enumerate(self.positions)}
-                        
-            # self.plot_graph_step(G, positions, tour)
-
+            
             while True:
                 neighbors = self.get_neighbors(tour)
                 current_distance = self.total_distance(tour)
@@ -105,25 +105,29 @@ class HillClimbingRestarts:
 
                 # Choose the neighbor with the smallest distance as the new tour
                 tour = neighbors[np.argmin(neighbors_distances)]
-                # Find the swapped cities
-                swapped_edges = []
-                swapped_nodes = []
+
                 for i in range(len(tour) - 1):
                     if old_tour[i] != tour[i]:
                         swapped_edges = [(tour[i-1], tour[i]), (tour[i+1], tour[i + 2])]
                         swapped_nodes = [tour[i-1], tour[i], tour[i+1], tour[i+2]]
                         break           
-                # self.plot_graph_step(G, positions, tour, swapped_edges=swapped_edges, swapped_nodes=swapped_nodes)
             
             tour_distance = self.total_distance(tour)
             if tour_distance < best_distance:
                 best_tour = tour
                 best_distance = tour_distance
+                
+            tours.append([node + 1 for node in tour])
+            distances.append(tour_distance)
             
             self.plot_graph_step(G, positions, tour)
+        
+        tours.append([node + 1 for node in best_tour])
+        distances.append(best_distance)
+        
         self.plot_graph_step(G, positions, best_tour, edge_colors='#E64E00', node_colors='#f05100')
         
         end_time = time.time()  # End timing
         elapsed_time = end_time - start_time
-        
-        return best_tour, best_distance, elapsed_time
+
+        return tours, None, distances, elapsed_time

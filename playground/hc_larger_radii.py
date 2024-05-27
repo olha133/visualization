@@ -44,7 +44,7 @@ class HillClimbingLargerRadii:
                 neighbors.append(new_tour)
         return neighbors
     
-    def plot_graph_step(self, G, positions, tour=None, swapped_edges=None, swapped_nodes=None):
+    def plot_graph_step(self, G, positions, tour=None, edge_colors='#3E5CC5', node_colors='#65B48E',swapped_edges=None, swapped_nodes=None):
         plt.clf()
         pos = {i: (positions[i][0], positions[i][1]) for i in range(len(positions))}
         
@@ -53,13 +53,13 @@ class HillClimbingLargerRadii:
         path_edges_background = list(G.edges)
         nx.draw(G, pos, with_labels=False, edgelist=path_edges_background, edge_color='#dbdbdb', width=1.5)
         labels = {i: i + 1 for i in G.nodes()}
-        nx.draw(G, pos, labels=labels, node_color='#65B48E', node_size=350, font_size=10, edgelist=path_edges, edge_color='#3E5CC5', width=2)
+        nx.draw(G, pos, labels=labels, node_color=node_colors, node_size=350, font_size=10, edgelist=path_edges, edge_color=edge_colors, width=2)
 
         if swapped_edges:
             nx.draw_networkx_edges(G, pos, edgelist=swapped_edges, edge_color='#E64E00', width=2)
         
         if swapped_nodes:
-            nx.draw_networkx_nodes(G, pos, nodelist=swapped_nodes, node_color='#E64E00', node_size=350)
+            nx.draw_networkx_nodes(G, pos, nodelist=swapped_nodes, node_color='#E6EB00', node_size=350)
         # Save the plot
         plot_dir = os.path.join(settings.MEDIA_ROOT, 'plots')
         if not os.path.exists(plot_dir):
@@ -88,7 +88,11 @@ class HillClimbingLargerRadii:
         # Create a graph and visualize it
         G = self.generate_complete_graph()
         positions = {i: pos for i, pos in enumerate(self.positions)}
-                
+                 
+        tours = [[node + 1 for node in tour]]
+        swapped_nodes_list = [] 
+        distances = []
+
         self.plot_graph_step(G, positions, tour)
 
         while True:
@@ -96,6 +100,8 @@ class HillClimbingLargerRadii:
             current_distance = self.total_distance(tour)
             neighbors_distances = [self.total_distance(neighbor) for neighbor in neighbors]
 
+            distances.append(current_distance)
+            
             # If there's no improvement, break the loop
             if min(neighbors_distances) >= current_distance:
                 break
@@ -106,18 +112,24 @@ class HillClimbingLargerRadii:
             tour = neighbors[np.argmin(neighbors_distances)]
              # Find the swapped cities
             swapped_edges = []
+            swapped_edge_nodes = []
             swapped_nodes = []
             for i in range(len(tour) - 1):
                 if old_tour[i] != tour[i]:
                     swapped_edges.append((tour[i-1], tour[i]))
                     swapped_edges.append((tour[i], tour[i+1]))
-                    swapped_nodes.append(tour[i])           
-            self.plot_graph_step(G, positions, tour, swapped_edges=swapped_edges, swapped_nodes=swapped_nodes)
+                    swapped_edge_nodes.append(tour[i])
+                    swapped_nodes.append(i)    
+            
+            swapped_nodes_list.append(swapped_nodes)
+            tours.append([node + 1 for node in tour])  
+                 
+            self.plot_graph_step(G, positions, tour, swapped_edges=swapped_edges, swapped_nodes=swapped_edge_nodes)
             self.plot_graph_step(G, positions, tour)
-
-        self.plot_graph_step(G, positions, tour)
+            
+        self.plot_graph_step(G, positions, tour,edge_colors='#E64E00', node_colors='#f05100')
         
         end_time = time.time()  # End timing
         elapsed_time = end_time - start_time
-        
-        return tour, self.total_distance(tour), elapsed_time
+
+        return tours, swapped_nodes_list, distances, elapsed_time

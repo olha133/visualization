@@ -65,17 +65,16 @@ def run_algorithm(algorithm_class, request):
     cleanup_old_plots()
     if algorithm_class == HillClimbingRestarts:
         iterations = int(request.POST.get('iterations', 1))
-        print(iterations)
         algorithm = algorithm_class(csv_file=filepath, num_runs=iterations)
     else:
         algorithm = algorithm_class(csv_file=filepath)
-    tours, swapped_nodes_list, distance, elapsed_time = algorithm.run()
+    tours, swapped_nodes_list, distances, elapsed_time = algorithm.run()
     plot_files = get_plot_files()
     
     return JsonResponse({
         'tours': tours,
         'swapped_nodes_list': swapped_nodes_list,
-        'distance': distance,
+        'distances': distances,
         'plot_files': plot_files,
         'elapsed_time': elapsed_time
     })
