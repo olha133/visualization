@@ -78,6 +78,7 @@ class HillClimbingRestarts:
         return G
     
     def run(self):
+        start_time = time.time()
         best_tour = None
         best_distance = float('inf')
         for _ in range(self.num_runs):
@@ -121,4 +122,8 @@ class HillClimbingRestarts:
             
             self.plot_graph_step(G, positions, tour)
         self.plot_graph_step(G, positions, best_tour, edge_colors='#E64E00', node_colors='#f05100')
-        return best_tour, best_distance
+        
+        end_time = time.time()  # End timing
+        elapsed_time = end_time - start_time
+        
+        return best_tour, best_distance, elapsed_time

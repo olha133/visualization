@@ -6,15 +6,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://kit.fontawesome.com/56051789c3.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
     <div>
         {% for alg in algorithms %}
-        <div>
-            <a href="/{{alg.key}}"><h5>{{alg.name}}</h5></a>
+        <div class="tooltip">
+            <a href="/{{alg.key}}">
+                <h5>{{alg.name}}</h5>
+            </a>
+            <span class="tooltiptext">{{ alg.description }}</span>
         </div>
         {% endfor %}
     </div>
@@ -24,7 +28,16 @@
         <label for="predefined">PRE-DEFINED</label>
         <input type="radio" id="custom" name="location" value="custom">
         <label for="custom">CUSTOM</label>
-    
+        <div class="tooltip">
+            <i class="fa-solid fa-circle-info" alt="Info" style="width: 16px; height: 16px;"></i>
+            <span class="tooltiptext">
+                <strong>map_example.csv:</strong><br>
+                <code>X, Y<br>
+                1, 2<br>
+                3, 3<br>
+                ...</code>
+            </span>
+        </div>
         <div id="predefined-options">
             <label>City count:</label>
             <input type="radio" name="city-count" value="5"> 5 cities
@@ -42,10 +55,12 @@
         <div id="error-message" style="color: red; display: none;"></div>
         <button id="replay-button" style="display: none;">Replay</button>
         <button id="start-button">Start</button>
+        <div id="waiting-message">Please wait while the visualization is being generated...</div>
     </div>
     <div id="result" style="display: none;">
         <h2>Best Tour: <span id="tour"></span></h2>
         <h2>Best Distance: <span id="distance"></span></h2>
+        <h2>Time: <span id="elapsed-time"></span></h2>
         <div id="plots">
             <ul class="rotating">
                 <!-- Plots will be dynamically added here -->
@@ -54,8 +69,10 @@
     </div>
     <script>
         function startVisualization(plotFiles) {
+            $('#waiting-message').hide();
             $('#tour').text(plotFiles.tour.join(' -> '));
             $('#distance').text(plotFiles.distance);
+            $('#elapsed-time').text(plotFiles.elapsed_time.toFixed(2) + ' seconds');
             $('.rotating').empty();
             plotFiles.plot_files.forEach(function(plot_file, index) {
                 let timestamp = new Date().getTime();

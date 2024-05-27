@@ -21,7 +21,7 @@
             }
 
             formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
-
+            $('#waiting-message').show();
             $.ajax({
                 url: '{% url "hc" %}',
                 method: 'POST',
@@ -33,10 +33,12 @@
                     plotFiles = response;
                     startVisualization(plotFiles);
                     $('#replay-button').show();
+                    $('#waiting-message').hide();
                 },
                 error: function(xhr, status, error) {
                     let errorMessage = xhr.responseJSON.error;
                     $('#error-message').text(errorMessage).show();
+                    $('#waiting-message').hide();
                 }
             });
         });

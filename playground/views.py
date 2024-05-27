@@ -19,8 +19,8 @@ def validate_csv(file_path):
     with open(file_path, newline='') as csvfile:
         reader = csv.DictReader(csvfile)
         rows = list(reader)
-        if len(rows) < 4:
-            return False, "The file must have at least 4 rows."
+        if len(rows) < 5:
+            return False, "The file must have at least 5 rows."
         if len(rows[0]) != 2:
             return False, "The file must have exactly 2 columns for X and Y coordinates."
     return True, None
@@ -69,10 +69,10 @@ def run_algorithm(algorithm_class, request):
         algorithm = algorithm_class(csv_file=filepath, num_runs=iterations)
     else:
         algorithm = algorithm_class(csv_file=filepath)
-    tour, distance = algorithm.run()
+    tour, distance, elapsed_time = algorithm.run()
     plot_files = get_plot_files()
     
-    return JsonResponse({'tour': tour, 'distance': distance, 'plot_files': plot_files})
+    return JsonResponse({'tour': tour, 'distance': distance, 'plot_files': plot_files, 'elapsed_time': elapsed_time})
 
 def hc(request):
     if request.method == 'POST':

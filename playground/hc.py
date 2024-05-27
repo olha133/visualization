@@ -78,6 +78,7 @@ class HillClimbing:
         return G
     
     def run(self):
+        start_time = time.time()
         # Generate a random initial tour
         tour = list(range(self.num_cities))
         random.shuffle(tour)
@@ -112,5 +113,8 @@ class HillClimbing:
          
             self.plot_graph_step(G, positions, tour, swapped_edges=swapped_edges, swapped_nodes=swapped_nodes)
             self.plot_graph_step(G, positions, tour)
-
-        return tour, self.total_distance(tour)
+        
+        end_time = time.time()  # End timing
+        elapsed_time = end_time - start_time
+        
+        return tour, self.total_distance(tour), elapsed_time
