@@ -1,143 +1,49 @@
-{% extends 'main.html' %}
+{% extends 'playground\main_hc.html' %}
 {% load static %}
-{% block content %}
-<!DOCTYPE html>
-<html lang="en">
+{% block ajax_url %}{% url "hc_restarts" %}{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body>
-    <div id="controls">
-        <h2>Maps</h2>
-        <input type="radio" id="predefined" name="location" value="predefined" checked>
-        <label for="predefined">PRE-DEFINED</label>
-        <input type="radio" id="custom" name="location" value="custom">
-        <label for="custom">CUSTOM</label>
-    
-        <div id="predefined-options">
-            <label>City count:</label>
-            <input type="radio" name="city-count" value="5"> 5 cities
-            <input type="radio" name="city-count" value="10"> 10 cities
-            <input type="radio" name="city-count" value="15"> 15 cities
-            <input type="radio" name="city-count" value="20"> 20 cities
-        </div>
-    
-        <div id="custom-options" style="display: none;">
-            <label for="myfile">Select a file:</label>
-            <input type="file" id="custom-file" name="custom_file" accept=".csv, text/csv"/>
-        </div>
-        <div id="iteration-slider">
-            <label for="iterations">Number of iterations:</label>
-            <input type="range" id="iterations" name="iterations" min="1" max="100" value="1" oninput="this.nextElementSibling.value = this.value">
-            <output>1</output>
-        </div>
-        <div id="error-message" style="color: red; display: none;"></div>
-        <button id="replay-button" style="display: none;">Replay</button>
-        <button id="start-button">Start</button>
-    </div>
-    <div id="result" style="display: none;">
-        <h2>Best Tour: <span id="tour"></span></h2>
-        <h2>Best Distance: <span id="distance"></span></h2>
-        <div id="plots">
-            <ul class="rotating">
-                <!-- Plots will be dynamically added here -->
-            </ul>
-        </div>
-    </div>
+{% block additional_content %}
+<div id="iteration-slider">
+    <label for="iterations">Number of iterations:</label>
+    <input type="range" id="iterations" name="iterations" min="1" max="100" value="1" oninput="this.nextElementSibling.value = this.value">
+    <output>1</output>
+</div>
+{% endblock %}
 
-    <script>
-        function startVisualization(plotFiles) {
-            $('#tour').text(plotFiles.tour.join(' -> '));
-            $('#distance').text(plotFiles.distance);
-            $('.rotating').empty();
-            plotFiles.plot_files.forEach(function(plot_file, index) {
-                let timestamp = new Date().getTime();
-                let plot_url = plot_file + '?t=' + timestamp;
-                $('.rotating').append('<li class="image"><img src="' + plot_url + '" alt="Plot" class="plot-image"></li>');
-            });
+<script>
+    $('#start-button').click(function() {
+        let formData = new FormData();
+        let selectedCityCount = $('input[name="city-count"]:checked').val();
+        let customFile = $('#custom-file')[0].files[0];
+        let iterations = $('#iterations').val();
 
-            let numberOfImages = plotFiles.plot_files.length;
-            let totalDuration = numberOfImages * 0.5; 
-
-            $('.rotating .image').each(function(index) {
-                $(this).css('animation', `rotate ${totalDuration}s forwards linear`);
-                $(this).css('animation-delay', `${index * 0.5}s`);
-            });
-
-            $('#result').show();
+        if (customFile) {
+            formData.append('custom_file', customFile);
+        } else if (selectedCityCount) {
+            formData.append('city_count', selectedCityCount);
+        } else {
+            $('#error-message').text('Please select the number of cities or upload a custom map.').show();
+            return;
         }
+        formData.append('iterations', iterations);
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
 
-        $(document).ready(function() {
-            let plotFiles;
-
-            $('input[name="location"]').change(function() {
-                if (this.value === 'predefined') {
-                    $('#predefined-options').show();
-                    $('#custom-options').hide();
-                    $('#custom-file').val('');
-                    $('#error-message').hide();
-                } else {
-                    $('#predefined-options').hide();
-                    $('#custom-options').show();
-                }
-            });
-            $('#custom-file').change(function(e) {
-                var ext = this.value.match(/\.([^\.]+)$/)[1];
-                if (ext !== 'csv') {
-                    $('#error-message').text('Not allowed. Please upload a CSV file.').show();
-                    this.value = '';
-                } else {
-                    $('#error-message').hide();
-                }
-            });
-            $('#start-button').click(function() {
-                let formData = new FormData();
-                let selectedCityCount = $('input[name="city-count"]:checked').val();
-                let customFile = $('#custom-file')[0].files[0];
-                let iterations = $('#iterations').val();
-                
-                if (customFile) {
-                    formData.append('custom_file', customFile);
-                } else if (selectedCityCount) {
-                    formData.append('city_count', selectedCityCount);
-                } else {
-                    $('#error-message').text('Please select the number of cities or upload a custom map.').show();
-                    return;
-                }
-                formData.append('iterations', iterations);
-                formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
-
-                $.ajax({
-                    url: '{% url "hc_restarts" %}', 
-                    method: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        $('#error-message').text('').hide();
-                        plotFiles = response;
-                        startVisualization(plotFiles);
-                        $('#replay-button').show();
-                    },
-                    error: function(xhr, status, error) {
-                        let errorMessage = xhr.responseJSON.error;
-                        $('#error-message').text(errorMessage).show();
-                    }
-                });
-            });
-            $('#replay-button').click(function() {
-                if (plotFiles) {
-                    startVisualization(plotFiles);
-                }
-            });
+        $.ajax({
+            url: '{% url "hc_restarts" %}', 
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                $('#error-message').text('').hide();
+                plotFiles = response;
+                startVisualization(plotFiles);
+                $('#replay-button').show();
+            },
+            error: function(xhr, status, error) {
+                let errorMessage = xhr.responseJSON.error;
+                $('#error-message').text(errorMessage).show();
+            }
         });
-    </script>
-</body>
-
-</html>
-{% endblock content %}
+    });
+</script>

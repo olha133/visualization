@@ -1,7 +1,3 @@
-{% extends 'main.html' %}
-
-{% block content %}
-
-<h1>HC larger search radii template</h1>
-
-{% endblock %}
+{% extends 'playground\main_hc.html' %}
+{% load static %}
+{% block ajax_url %}{% url "hc_larger_radii" %}{% endblock %}

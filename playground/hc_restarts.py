@@ -89,7 +89,7 @@ class HillClimbingRestarts:
             G = self.generate_complete_graph()
             positions = {i: pos for i, pos in enumerate(self.positions)}
                         
-            self.plot_graph_step(G, positions, tour)
+            # self.plot_graph_step(G, positions, tour)
 
             while True:
                 neighbors = self.get_neighbors(tour)
@@ -112,7 +112,7 @@ class HillClimbingRestarts:
                         swapped_edges = [(tour[i-1], tour[i]), (tour[i+1], tour[i + 2])]
                         swapped_nodes = [tour[i-1], tour[i], tour[i+1], tour[i+2]]
                         break           
-                self.plot_graph_step(G, positions, tour, swapped_edges=swapped_edges, swapped_nodes=swapped_nodes)
+                # self.plot_graph_step(G, positions, tour, swapped_edges=swapped_edges, swapped_nodes=swapped_nodes)
             
             tour_distance = self.total_distance(tour)
             if tour_distance < best_distance:
