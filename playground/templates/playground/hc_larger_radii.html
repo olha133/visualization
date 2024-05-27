@@ -1,3 +1,47 @@
 {% extends 'playground\main_hc.html' %}
 {% load static %}
-{% block ajax_url %}{% url "hc_larger_radii" %}{% endblock %}
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('#start-button').click(function() {
+            let formData = new FormData();
+            let selectedCityCount = $('input[name="city-count"]:checked').val();
+            let customFile = $('#custom-file')[0].files[0];
+
+            if (customFile) {
+                formData.append('custom_file', customFile);
+            } else if (selectedCityCount) {
+                formData.append('city_count', selectedCityCount);
+            } else {
+                $('#error-message').text('Please select the number of cities or upload a custom map.').show();
+                return;
+            }
+
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+            $.ajax({
+                url: '{% url "hc_larger_radii" %}', 
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    $('#error-message').text('').hide();
+                    plotFiles = response;
+                    startVisualization(plotFiles);
+                    $('#replay-button').show();
+                },
+                error: function(xhr, status, error) {
+                    let errorMessage = xhr.responseJSON.error;
+                    $('#error-message').text(errorMessage).show();
+                }
+            });
+        });
+        $('#replay-button').click(function() {
+                if (plotFiles) {
+                    startVisualization(plotFiles);
+                }
+        });
+    });
+</script>
+{% endblock %}
