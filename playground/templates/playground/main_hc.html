@@ -86,12 +86,13 @@
                 } else {
                     $('#predefined-options').hide();
                     $('#custom-options').show();
+                    $('input[name="city-count"]').prop('checked', false);
                 }
             });
             $('#custom-file').change(function(e) {
                 var ext = this.value.match(/\.([^\.]+)$/)[1];
                 if (ext !== 'csv') {
-                    $('#error-message').text('Not allowed. Please upload a CSV file.').show();
+                    $('#error-message').text('Please upload a CSV file.').show();
                     this.value = '';
                 } else {
                     $('#error-message').hide();
@@ -100,6 +101,15 @@
         });
     </script>
     {% block extra_js %}{% endblock %}
+    <script>
+        $(document).ready(function() {
+            $('#replay-button').click(function() {
+                if (plotFiles) {
+                    startVisualization(plotFiles);
+                }
+             });
+        });
+    </script>
 </body>
 
 </html>

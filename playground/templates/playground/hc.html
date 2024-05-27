@@ -12,8 +12,11 @@
                 formData.append('custom_file', customFile);
             } else if (selectedCityCount) {
                 formData.append('city_count', selectedCityCount);
+            } else if ($('input[name="location"]:checked').val() === 'custom' && !customFile) {
+                $('#error-message').text('Please upload a custom map file.').show();
+                return;
             } else {
-                $('#error-message').text('Please select the number of cities or upload a custom map.').show();
+                $('#error-message').text('Please select the number of cities.').show();
                 return;
             }
 
@@ -36,11 +39,6 @@
                     $('#error-message').text(errorMessage).show();
                 }
             });
-        });
-        $('#replay-button').click(function() {
-                if (plotFiles) {
-                    startVisualization(plotFiles);
-                }
         });
     });
 </script>
