@@ -3,14 +3,15 @@
 {% block additional_content %}
 <div id="iteration-slider">
     <label for="iterations">Number of iterations:</label>
-    <input type="range" id="iterations" name="iterations" min="1" max="100" value="1" oninput="this.nextElementSibling.value = this.value">
+    <input type="range" id="iterations" name="iterations" min="1" max="100" value="1"
+        oninput="this.nextElementSibling.value = this.value">
     <output>1</output>
 </div>
 {% endblock %}
 {% block extra_js %}
 <script>
-    $(document).ready(function() {
-        $('#start-button').click(function() {
+    $(document).ready(function () {
+        $('#start-button').click(function () {
             let formData = new FormData();
             let selectedCityCount = $('input[name="city-count"]:checked').val();
             let customFile = $('#custom-file')[0].files[0];
@@ -31,19 +32,19 @@
             formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
             $('#waiting-message').show();
             $.ajax({
-                url: '{% url "hc_restarts" %}', 
+                url: '{% url "hc_restarts" %}',
                 method: 'POST',
                 data: formData,
                 processData: false,
                 contentType: false,
-                success: function(response) {
+                success: function (response) {
                     $('#error-message').text('').hide();
                     plotFiles = response;
                     startVisualization(plotFiles);
                     $('#replay-button').show();
                     $('#waiting-message').hide();
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     let errorMessage = xhr.responseJSON.error;
                     $('#error-message').text(errorMessage).show();
                     $('#waiting-message').hide();

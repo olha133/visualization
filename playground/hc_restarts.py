@@ -1,3 +1,6 @@
+from django.conf import settings
+from scipy.spatial.distance import pdist, squareform
+import matplotlib.pyplot as plt
 import random
 import numpy as np
 import time
@@ -6,9 +9,7 @@ import os
 import networkx as nx
 import matplotlib
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-from scipy.spatial.distance import pdist, squareform
-from django.conf import settings
+
 
 class HillClimbingRestarts:
     def __init__(self, num_cities=5, num_runs=1, csv_file=None):
@@ -39,35 +40,41 @@ class HillClimbingRestarts:
         neighbors = []
         for i in range(1, len(tour) - 2):  # Exclude the first and last city
             new_tour = tour[:]
-            new_tour[i], new_tour[i + 1] = new_tour[i + 1], new_tour[i]  # Swap two adjacent cities
+            new_tour[i], new_tour[i + 1] = new_tour[i +
+                                                    1], new_tour[i]  # Swap two adjacent cities
             neighbors.append(new_tour)
         return neighbors
-    
-    def plot_graph_step(self, G, positions, tour=None, edge_colors='#3E5CC5', node_colors='#65B48E',swapped_edges=None, swapped_nodes=None):
+
+    def plot_graph_step(self, G, positions, tour=None, edge_colors='#3E5CC5', node_colors='#65B48E', swapped_edges=None, swapped_nodes=None):
         plt.clf()
-        pos = {i: (positions[i][0], positions[i][1]) for i in range(len(positions))}
-        
+        pos = {i: (positions[i][0], positions[i][1])
+               for i in range(len(positions))}
+
         if tour:
             path_edges = list(zip(tour, tour[1:]))
         path_edges_background = list(G.edges)
-        nx.draw(G, pos, with_labels=False, edgelist=path_edges_background, edge_color='#dbdbdb', width=1.5)
+        nx.draw(G, pos, with_labels=False, edgelist=path_edges_background,
+                edge_color='#dbdbdb', width=1.5)
         labels = {i: i + 1 for i in G.nodes()}
-        nx.draw(G, pos, labels=labels, node_color=node_colors, node_size=350, font_size=10, edgelist=path_edges, edge_color=edge_colors, width=2)
+        nx.draw(G, pos, labels=labels, node_color=node_colors, node_size=350,
+                font_size=10, edgelist=path_edges, edge_color=edge_colors, width=2)
 
         if swapped_edges:
-            nx.draw_networkx_edges(G, pos, edgelist=swapped_edges, edge_color='#E64E00', width=2)
-        
+            nx.draw_networkx_edges(
+                G, pos, edgelist=swapped_edges, edge_color='#E64E00', width=2)
+
         if swapped_nodes:
-            nx.draw_networkx_nodes(G, pos, nodelist=swapped_nodes, node_color='#E6EB00', node_size=350)
-                # Save the plot
+            nx.draw_networkx_nodes(
+                G, pos, nodelist=swapped_nodes, node_color='#E6EB00', node_size=350)
+            # Save the plot
         plot_dir = os.path.join(settings.MEDIA_ROOT, 'plots')
         if not os.path.exists(plot_dir):
             os.makedirs(plot_dir)
         plot_filename = os.path.join(plot_dir, f'plot_{self.plot_counter}.png')
         plt.savefig(plot_filename, dpi=500)
-        
+
         self.plot_counter += 1
-                
+
     def generate_complete_graph(self):
         G = nx.Graph()
         n = len(self.distance_matrix)
@@ -76,7 +83,7 @@ class HillClimbingRestarts:
                 if self.distance_matrix[i][j] != 0:
                     G.add_edge(i, j, weight=self.distance_matrix[i][j])
         return G
-    
+
     def run(self):
         start_time = time.time()
         best_tour = None
@@ -91,11 +98,12 @@ class HillClimbingRestarts:
             # Create a graph and visualize it
             G = self.generate_complete_graph()
             positions = {i: pos for i, pos in enumerate(self.positions)}
-            
+
             while True:
                 neighbors = self.get_neighbors(tour)
                 current_distance = self.total_distance(tour)
-                neighbors_distances = [self.total_distance(neighbor) for neighbor in neighbors]
+                neighbors_distances = [self.total_distance(
+                    neighbor) for neighbor in neighbors]
 
                 # If there's no improvement, break the loop
                 if min(neighbors_distances) >= current_distance:
@@ -108,25 +116,28 @@ class HillClimbingRestarts:
 
                 for i in range(len(tour) - 1):
                     if old_tour[i] != tour[i]:
-                        swapped_edges = [(tour[i-1], tour[i]), (tour[i+1], tour[i + 2])]
-                        swapped_nodes = [tour[i-1], tour[i], tour[i+1], tour[i+2]]
-                        break           
-            
+                        swapped_edges = [(tour[i-1], tour[i]),
+                                         (tour[i+1], tour[i + 2])]
+                        swapped_nodes = [tour[i-1],
+                                         tour[i], tour[i+1], tour[i+2]]
+                        break
+
             tour_distance = self.total_distance(tour)
             if tour_distance < best_distance:
                 best_tour = tour
                 best_distance = tour_distance
-                
+
             tours.append([node + 1 for node in tour])
             distances.append(tour_distance)
-            
+
             self.plot_graph_step(G, positions, tour)
-        
+
         tours.append([node + 1 for node in best_tour])
         distances.append(best_distance)
-        
-        self.plot_graph_step(G, positions, best_tour, edge_colors='#E64E00', node_colors='#f05100')
-        
+
+        self.plot_graph_step(G, positions, best_tour,
+                             edge_colors='#E64E00', node_colors='#f05100')
+
         end_time = time.time()  # End timing
         elapsed_time = end_time - start_time
 

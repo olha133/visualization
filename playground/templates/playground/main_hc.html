@@ -45,19 +45,25 @@
             <input type="radio" name="city-count" value="15"> 15 cities
             <input type="radio" name="city-count" value="20"> 20 cities
         </div>
-    
+
         <div id="custom-options" style="display: none;">
             <label for="myfile">Select a file:</label>
-            <input type="file" id="custom-file" name="custom_file" accept=".csv, text/csv"/>
+            <input type="file" id="custom-file" name="custom_file" accept=".csv, text/csv" />
         </div>
         {% block additional_content %}
         {% endblock %}
         <div id="error-message" style="color: red; display: none;"></div>
-        <button id="replay-button" style="display: none;">Replay</button>
-        <button id="start-button">Start</button>
+        </div>
+        <div id="navigation-buttons">
+            <button id="prev-button" disabled><i class="fa-solid fa-backward"></i></button>
+            <button id="next-button" disabled><i class="fa-solid fa-forward"></i></button>
+            <button id="replay-button" disabled><i class="fa-solid fa-repeat"></i></button>
+            <button id="start-button"><i class="fa-solid fa-play"></i></button>
+        </div>
         <div id="waiting-message">Please wait while the visualization is being generated...</div>
     </div>
     <div id="result" style="display: none;">
+        <h2 id="iteration-section" style="display: none;">Iteration: <span id="iteration-count">0</span></h2> <!-- Initially hidden -->
         <h2>Tour: <span id="tours"></span></h2>
         <h2>Distance: <span id="distances"></span></h2>
         <h2>Time: <span id="elapsed-time"></span></h2>
@@ -68,6 +74,12 @@
         </div>
     </div>
     <script>
+        let history = {
+            tours: [],
+            distances: [],
+            swappedNodes: [],
+            // currentStep: 0
+        };
         function waitOneSecond() {
             return new Promise(resolve => setTimeout(resolve, 1000));
         }
@@ -78,68 +90,140 @@
                 return `<span style="background:${color}; border-radius: 50%;">${node}</span>`;
             }).join('-');
             $('#tours').html(tourHtml);
-        }   
-        
+        }
+        function displayHistory(data, idx) {
+            $('.rotating .image').hide().eq(idx).show();
+            highlightTour(history.tours[idx], history.swappedNodes[idx]);
+            $('#distances').text(history.distances[idx].toFixed(2));
+            // $('#iteration-count').text(step + 1);
+        }
+
         function startVisualization(data) {
             $('#waiting-message').hide();
             $('#distances').text(data.distances);
             $('#elapsed-time').text(data.elapsed_time.toFixed(2) + ' seconds');
             $('.rotating').empty();
 
-            data.plot_files.forEach(function(plot_file, index) {
+            data.plot_files.forEach(function (plot_file, index) {
                 let timestamp = new Date().getTime();
                 let plot_url = plot_file + '?t=' + timestamp;
                 $('.rotating').append('<li class="image"><img src="' + plot_url + '" alt="Plot" class="plot-image"></li>');
             });
 
             let numberOfImages = data.plot_files.length;
-            let totalDuration = numberOfImages * 1; 
+            let totalDuration = numberOfImages * 1;
 
-            $('.rotating .image').each(function(index) {
+            $('.rotating .image').each(function (index) {
                 $(this).css('animation', `rotate ${totalDuration}s forwards linear`);
                 $(this).css('animation-delay', `${index * 1}s`);
             });
-
+            let currentTourIndex = data.tours.length;
+            let currentPlotIndex = data.plot_files.length - 1;
             async function displayNextTour(data, tourIndex) {
-                if (tourIndex < data.tours.length - 1 ) {
-                    if( data.swapped_nodes_list == null){
+                if (tourIndex < data.tours.length - 1) {
+                    if (data.swapped_nodes_list == null) {
+                        $('#iteration-section').show();
                         highlightTour(data.tours[tourIndex], null);
                         $('#distances').text(data.distances[tourIndex].toFixed(2));
+
+                        history.tours.push(data.tours[tourIndex])
+                        history.distances.push(data.distances[tourIndex])
+                        history.swappedNodes.push(null)
                         tourIndex++;
+                        $('#iteration-count').text(tourIndex); // Update iteration count
+
                         setTimeout(() => displayNextTour(data, tourIndex), 1000);
                     }
-                    else{
+                    else {
                         highlightTour(data.tours[tourIndex], null); // Initial tour highlight
+                        
+                        history.tours.push(data.tours[tourIndex])
+                        history.distances.push(data.distances[tourIndex])
+                        history.swappedNodes.push(null)
+
                         $('#distances').text(data.distances[tourIndex].toFixed(2));
                         await waitOneSecond(); // Wait for 1 second
 
                         highlightTour(data.tours[tourIndex], data.swapped_nodes_list[tourIndex] || []); // Highlight swapped nodes
+                        
+                        history.tours.push(data.tours[tourIndex])
+                        history.distances.push(data.distances[tourIndex])
+                        history.swappedNodes.push(data.swapped_nodes_list[tourIndex] || null)
+                        
                         tourIndex++;
                         setTimeout(() => displayNextTour(data, tourIndex), 1000);
                     }
                 }
                 else{
-                    if( data.swapped_nodes_list == null){
+                    if (data.swapped_nodes_list == null) {
+                        $('#iteration-section').hide();
                         highlightTour(data.tours[tourIndex], null, '#E64E00');
                         $('#distances').text(data.distances[tourIndex].toFixed(2));
+
+                        history.tours.push(data.tours[tourIndex])
+                        history.distances.push(data.distances[tourIndex])
+                        history.swappedNodes.push(null)
+
+                        history.tours.push(data.tours[tourIndex])
+                        history.distances.push(data.distances[tourIndex])
+                        history.swappedNodes.push(null)
                     }
-                    else{
+                    else {
                         $('#distances').text(data.distances[tourIndex].toFixed(2));
                         await waitOneSecond();
                         highlightTour(data.tours[tourIndex], null, '#E64E00');
-                        
+
+                        history.tours.push(data.tours[tourIndex])
+                        history.distances.push(data.distances[tourIndex])
+                        history.swappedNodes.push(null)
+
+                        history.tours.push(data.tours[tourIndex])
+                        history.distances.push(data.distances[tourIndex])
+                        history.swappedNodes.push(null)
+
                     }
+                    // Enable navigation buttons
+                    $('#prev-button').prop('disabled', false);
+                    $('#replay-button').prop('disabled', false);
+                    console.log(history.tours)
+                    console.log(history.distances)
                 }
             }
-            
+
             $('#result').show();
             displayNextTour(data, 0);
+            $('#prev-button').click(function () {
+                if (currentPlotIndex >= 0) {
+                    currentPlotIndex--;
+                    displayHistory(data, currentPlotIndex);
+                    $('#next-button').prop('disabled', false);
+                }
+                if (currentPlotIndex === 0) {
+                    $('#prev-button').prop('disabled', true);
+                }
+            });
+
+            $('#next-button').click(function () {
+                if (currentPlotIndex < data.plot_files.length - 1) {
+                    currentPlotIndex++;
+                    displayHistory(data, currentPlotIndex);
+                    $('#prev-button').prop('disabled', false);
+                }
+                if (currentPlotIndex == data.plot_files.length - 1){
+                    $('#next-button').prop('disabled', true);
+                }
+
+            });
+
+            $('#replay-button').click(function () {
+                startVisualization(data);
+            });
         }
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             let plotFiles;
 
-            $('input[name="location"]').change(function() {
+            $('input[name="location"]').change(function () {
                 if (this.value === 'predefined') {
                     $('#predefined-options').show();
                     $('#custom-options').hide();
@@ -151,7 +235,7 @@
                     $('input[name="city-count"]').prop('checked', false);
                 }
             });
-            $('#custom-file').change(function(e) {
+            $('#custom-file').change(function (e) {
                 var ext = this.value.match(/\.([^\.]+)$/)[1];
                 if (ext !== 'csv') {
                     $('#error-message').text('Please upload a CSV file.').show();
@@ -164,12 +248,12 @@
     </script>
     {% block extra_js %}{% endblock %}
     <script>
-        $(document).ready(function() {
-            $('#replay-button').click(function() {
+        $(document).ready(function () {
+            $('#replay-button').click(function () {
                 if (plotFiles) {
                     startVisualization(plotFiles);
                 }
-             });
+            });
         });
     </script>
 </body>
