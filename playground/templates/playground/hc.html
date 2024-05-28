@@ -4,7 +4,9 @@
 <script>
     $(document).ready(function () {
         $('#start-button').click(function () {
+            let weighted = $('#weighted').is(':checked');
             let formData = new FormData();
+            formData.append('weighted', weighted);
             let selectedCityCount = $('input[name="city-count"]:checked').val();
             let customFile = $('#custom-file')[0].files[0];
 

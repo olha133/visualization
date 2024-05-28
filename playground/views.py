@@ -72,11 +72,13 @@ def run_algorithm(algorithm_class, request):
         return JsonResponse({'error': error_message}, status=400)
 
     cleanup_old_plots()
+    weighted = request.POST.get('weighted') == 'true'
+    
     if algorithm_class == HillClimbingRestarts:
         iterations = int(request.POST.get('iterations', 1))
-        algorithm = algorithm_class(csv_file=filepath, num_runs=iterations)
+        algorithm = algorithm_class(csv_file=filepath, num_runs=iterations, weighted=weighted)
     else:
-        algorithm = algorithm_class(csv_file=filepath)
+        algorithm = algorithm_class(csv_file=filepath, weighted=weighted)
     tours, swapped_nodes_list, distances, elapsed_time = algorithm.run()
     plot_files = get_plot_files()
 

@@ -12,7 +12,7 @@ matplotlib.use('Agg')
 
 
 class HillClimbingRestarts:
-    def __init__(self, num_cities=5, num_runs=1, csv_file=None):
+    def __init__(self, num_cities=5, num_runs=1, csv_file=None, weighted=False):
         self.num_cities = num_cities
         self.num_runs = num_runs
         self.csv_file = csv_file
@@ -20,6 +20,8 @@ class HillClimbingRestarts:
         self.random_seed = int(time.time())
         random.seed(self.random_seed)
         self.plot_counter = 0
+        self.weighted = weighted
+
 
     def generate_distance_matrix(self):
         # If CSV file exists, read it. Otherwise, generate random positions and calculate the distance matrix
@@ -66,6 +68,11 @@ class HillClimbingRestarts:
         if swapped_nodes:
             nx.draw_networkx_nodes(
                 G, pos, nodelist=swapped_nodes, node_color='#E6EB00', node_size=350)
+            
+        if self.weighted and tour:
+            edge_labels = {(u, v): f"{G[u][v]['weight']:.2f}" for u, v in path_edges}
+            nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_color=edge_colors)
+            
             # Save the plot
         plot_dir = os.path.join(settings.MEDIA_ROOT, 'plots')
         if not os.path.exists(plot_dir):
@@ -84,7 +91,7 @@ class HillClimbingRestarts:
                     G.add_edge(i, j, weight=self.distance_matrix[i][j])
         return G
 
-    def run(self):
+    def run(self, weighted=False):
         start_time = time.time()
         best_tour = None
         best_distance = float('inf')

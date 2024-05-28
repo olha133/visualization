@@ -12,13 +12,14 @@ matplotlib.use('Agg')
 
 
 class HillClimbing:
-    def __init__(self, num_cities=5, csv_file=None):
+    def __init__(self, num_cities=5, csv_file=None, weighted=False):
         self.num_cities = num_cities
         self.csv_file = csv_file
         self.positions, self.distance_matrix = self.generate_distance_matrix()
         self.random_seed = int(time.time())
         random.seed(self.random_seed)
         self.plot_counter = 0
+        self.weighted = weighted
 
     def generate_distance_matrix(self):
         # If CSV file exists, read it. Otherwise, generate random positions and calculate the distance matrix
@@ -65,6 +66,10 @@ class HillClimbing:
         if swapped_nodes:
             nx.draw_networkx_nodes(
                 G, pos, nodelist=swapped_nodes, node_color='#E6EB00', node_size=350)
+        
+        if self.weighted and tour:
+            edge_labels = {(u, v): f"{G[u][v]['weight']:.2f}" for u, v in path_edges}
+            nx.draw_networkx_edge_labels(G, pos, font_size=8, edge_labels=edge_labels, font_color=edge_colors)
 
         # Save the plot
         plot_dir = os.path.join(settings.MEDIA_ROOT, 'plots')

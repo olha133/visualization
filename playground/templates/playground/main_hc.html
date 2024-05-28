@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Algorithm visualization</title>
     <link rel="stylesheet" href="{% static 'styles.css' %}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://kit.fontawesome.com/56051789c3.js" crossorigin="anonymous"></script>
@@ -50,6 +50,10 @@
             <label for="myfile">Select a file:</label>
             <input type="file" id="custom-file" name="custom_file" accept=".csv, text/csv" />
         </div>
+        <div>
+            <input type="checkbox" id="weighted" name="weighted">
+            <label for="weighted">Display Weights on Graph</label>
+        </div>
         {% block additional_content %}
         {% endblock %}
         <div id="error-message" style="color: red; display: none;"></div>
@@ -91,14 +95,21 @@
             }).join('-');
             $('#tours').html(tourHtml);
         }
-        function displayHistory(data, idx) {
+        function displayHistory(data, idx, hcRestarts, color = '#65B48E') {
             $('.rotating .image').hide().eq(idx).show();
-            highlightTour(history.tours[idx], history.swappedNodes[idx]);
+            highlightTour(history.tours[idx], history.swappedNodes[idx], color);
             $('#distances').text(history.distances[idx].toFixed(2));
-            // $('#iteration-count').text(step + 1);
+            if(hcRestarts){
+                $('#iteration-section').show();
+                $('#iteration-count').text(idx + 1);
+            }
         }
 
         function startVisualization(data) {
+            let hcRestarts = false;
+            if (data.swapped_nodes_list == null) {
+                hcRestarts = true;
+            }
             $('#waiting-message').hide();
             $('#distances').text(data.distances);
             $('#elapsed-time').text(data.elapsed_time.toFixed(2) + ' seconds');
@@ -121,7 +132,7 @@
             let currentPlotIndex = data.plot_files.length - 1;
             async function displayNextTour(data, tourIndex) {
                 if (tourIndex < data.tours.length - 1) {
-                    if (data.swapped_nodes_list == null) {
+                    if (hcRestarts == true) {
                         $('#iteration-section').show();
                         highlightTour(data.tours[tourIndex], null);
                         $('#distances').text(data.distances[tourIndex].toFixed(2));
@@ -155,7 +166,7 @@
                     }
                 }
                 else{
-                    if (data.swapped_nodes_list == null) {
+                    if (hcRestarts == true) {
                         $('#iteration-section').hide();
                         highlightTour(data.tours[tourIndex], null, '#E64E00');
                         $('#distances').text(data.distances[tourIndex].toFixed(2));
@@ -185,8 +196,6 @@
                     // Enable navigation buttons
                     $('#prev-button').prop('disabled', false);
                     $('#replay-button').prop('disabled', false);
-                    console.log(history.tours)
-                    console.log(history.distances)
                 }
             }
 
@@ -195,7 +204,7 @@
             $('#prev-button').click(function () {
                 if (currentPlotIndex >= 0) {
                     currentPlotIndex--;
-                    displayHistory(data, currentPlotIndex);
+                    displayHistory(data, currentPlotIndex, hcRestarts);
                     $('#next-button').prop('disabled', false);
                 }
                 if (currentPlotIndex === 0) {
@@ -206,7 +215,13 @@
             $('#next-button').click(function () {
                 if (currentPlotIndex < data.plot_files.length - 1) {
                     currentPlotIndex++;
-                    displayHistory(data, currentPlotIndex);
+                    if (currentPlotIndex == data.plot_files.length - 1){
+                        $('#iteration-section').hide();
+                        displayHistory(data, currentPlotIndex, false, '#E64E00');
+                    }
+                    else{
+                        displayHistory(data, currentPlotIndex, hcRestarts);
+                    }
                     $('#prev-button').prop('disabled', false);
                 }
                 if (currentPlotIndex == data.plot_files.length - 1){
@@ -247,15 +262,6 @@
         });
     </script>
     {% block extra_js %}{% endblock %}
-    <script>
-        $(document).ready(function () {
-            $('#replay-button').click(function () {
-                if (plotFiles) {
-                    startVisualization(plotFiles);
-                }
-            });
-        });
-    </script>
 </body>
 
 </html>
