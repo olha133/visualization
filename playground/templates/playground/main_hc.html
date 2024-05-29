@@ -83,7 +83,6 @@
             </div>
             {% block additional_content %}
             {% endblock %}
-            <div id="error-message" style="color: red; display: none;"></div>
             <div class="button-container" id="section">
                 <h3 class="blue-bottom">Controls</h3>
                 <button class="nav-button" id="prev-button" disabled><i class="fa-solid fa-backward"></i></button>
@@ -91,9 +90,10 @@
                 <button class="nav-button" id="replay-button" disabled><i class="fa-solid fa-repeat"></i></button>
                 <button class="nav-button" id="start-button"><i class="fa-solid fa-play"></i></button>
             </div>
-            <div id="waiting-message">Please wait while the visualization is being generated...</div>
+            <div id="error-message"></div>
         </div>
         <div class="visualization" id="visualization">
+            <div id="waiting-message">Please wait...</div>
             <div id="result" style="display: none;">
                 <div id="plots">
                     <ul class="rotating">
@@ -125,7 +125,7 @@
         function highlightTour(tour, swappedNodes, backgroundColor = '#65B48E') {
             let tourHtml = tour.map((node, index) => {
                 let color = (swappedNodes && swappedNodes.includes(index)) ? '#E6EB00' : backgroundColor;
-                return `<span style="background:${color}; border-radius: 50%;">${node}</span>`;
+                return `<span style="background:${color};">${node}</span>`;
             }).join('-');
             $('#tours').html(tourHtml);
         }

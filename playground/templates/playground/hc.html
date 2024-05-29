@@ -23,6 +23,7 @@
             }
 
             formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+            $('#result').hide()
             $('#waiting-message').show();
             $.ajax({
                 url: '{% url "hc" %}',
