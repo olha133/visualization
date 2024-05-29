@@ -12,69 +12,83 @@
 </head>
 
 <body>
-    <div>
-        {% for alg in algorithms %}
-        <div class="tooltip">
-            <a href="/{{alg.key}}">
-                <h5>{{alg.name}}</h5>
-            </a>
-            <span class="tooltiptext">{{ alg.description }}</span>
-        </div>
-        {% endfor %}
+    <hr />
+    <div id="demo-container">
+        <ul id="simple-menu">
+            <li><a href="/" class="current"><span>Hill climbing</span></a></li>
+            <li><a href="/hc_restarts"><span>Hill climbing with restarts</span></a></li>
+            <li><a href="/hc_larger_radii"><span>Hill climbing with larger search radii</span></a></li>
+        </ul>
     </div>
-    <div id="controls">
-        <h2>Maps</h2>
-        <input type="radio" id="predefined" name="location" value="predefined" checked>
-        <label for="predefined">PRE-DEFINED</label>
-        <input type="radio" id="custom" name="location" value="custom">
-        <label for="custom">CUSTOM</label>
-        <div class="tooltip">
-            <i class="fa-solid fa-circle-info" alt="Info" style="width: 16px; height: 16px;"></i>
-            <span class="tooltiptext">
-                <strong>map_example.csv:</strong><br>
-                <code>X, Y<br>
-                1, 2<br>
-                3, 3<br>
-                ...</code>
-            </span>
-        </div>
-        <div id="predefined-options">
-            <label>City count:</label>
-            <input type="radio" name="city-count" value="5"> 5 cities
-            <input type="radio" name="city-count" value="10"> 10 cities
-            <input type="radio" name="city-count" value="15"> 15 cities
-            <input type="radio" name="city-count" value="20"> 20 cities
-        </div>
 
-        <div id="custom-options" style="display: none;">
-            <label for="myfile">Select a file:</label>
-            <input type="file" id="custom-file" name="custom_file" accept=".csv, text/csv" />
+    <div class="container">
+        <div class="sidebar">
+            <div class="description">
+                <h3>About this Site</h3>
+                <p>This site allows you to visualize different variations of the Hill Climbing algorithm applied to the
+                    Traveling Salesman Problem.</p>
+            </div>
+
+            <div class="tsp-parameters">
+                <h3>TSP Parameters</h3>
+                <input type="radio" id="predefined" name="location" value="predefined" checked>
+                <label for="predefined">Pre-defined Map</label>
+                <input type="radio" id="custom" name="location" value="custom">
+                <label for="custom">Custom Map</label>
+
+                <div class="tooltip">
+                    <i class="fa-solid fa-circle-info" alt="Info" style="width: 16px; height: 16px;"></i>
+                    <span class="tooltiptext">
+                        <strong>map_example.csv:</strong><br>
+                        <code>X, Y<br>
+                        1, 2<br>
+                        3, 3<br>
+                        ...</code>
+                    </span>
+                </div>
+
+                <div id="predefined-options">
+                    <label>City count:</label>
+                    <input type="radio" name="city-count" value="5"> 5 cities
+                    <input type="radio" name="city-count" value="10"> 10 cities
+                    <input type="radio" name="city-count" value="15"> 15 cities
+                    <input type="radio" name="city-count" value="20"> 20 cities
+                </div>
+
+                <div id="custom-options" style="display: none;">
+                    <label for="myfile">Select a file:</label>
+                    <input type="file" id="custom-file" name="custom_file" accept=".csv, text/csv" />
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="weighted" name="weighted">
+                    <span class="slider round"></span>
+                    Display Weights on Graph
+                </label>
+            </div>
+            {% block additional_content %}
+            {% endblock %}
+            <div id="error-message" style="color: red; display: none;"></div>
+            <div id="navigation-buttons">
+                <button id="prev-button" disabled><i class="fa-solid fa-backward"></i></button>
+                <button id="next-button" disabled><i class="fa-solid fa-forward"></i></button>
+                <button id="replay-button" disabled><i class="fa-solid fa-repeat"></i></button>
+                <button id="start-button"><i class="fa-solid fa-play"></i></button>
+                <div id="waiting-message">Please wait while the visualization is being generated...</div>
+            </div>
         </div>
-        <div>
-            <input type="checkbox" id="weighted" name="weighted">
-            <label for="weighted">Display Weights on Graph</label>
-        </div>
-        {% block additional_content %}
-        {% endblock %}
-        <div id="error-message" style="color: red; display: none;"></div>
-        </div>
-        <div id="navigation-buttons">
-            <button id="prev-button" disabled><i class="fa-solid fa-backward"></i></button>
-            <button id="next-button" disabled><i class="fa-solid fa-forward"></i></button>
-            <button id="replay-button" disabled><i class="fa-solid fa-repeat"></i></button>
-            <button id="start-button"><i class="fa-solid fa-play"></i></button>
-        </div>
-        <div id="waiting-message">Please wait while the visualization is being generated...</div>
-    </div>
-    <div id="result" style="display: none;">
-        <h2 id="iteration-section" style="display: none;">Iteration: <span id="iteration-count">0</span></h2> <!-- Initially hidden -->
-        <h2>Tour: <span id="tours"></span></h2>
-        <h2>Distance: <span id="distances"></span></h2>
-        <h2>Time: <span id="elapsed-time"></span></h2>
-        <div id="plots">
-            <ul class="rotating">
-                <!-- Plots will be dynamically added here -->
-            </ul>
+        <div class="visualization" id="visualization">
+            <div id="result" style="display: none;">
+                <h2 id="iteration-section" style="display: none;">Iteration: <span id="iteration-count">0</span></h2>
+                <!-- Initially hidden -->
+                <h2>Tour: <span id="tours"></span></h2>
+                <h2>Distance: <span id="distances"></span></h2>
+                <h2>Time: <span id="elapsed-time"></span></h2>
+                <div id="plots">
+                    <ul class="rotating">
+                        <!-- Plots will be dynamically added here -->
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
     <script>
@@ -99,7 +113,7 @@
             $('.rotating .image').hide().eq(idx).show();
             highlightTour(history.tours[idx], history.swappedNodes[idx], color);
             $('#distances').text(history.distances[idx].toFixed(2));
-            if(hcRestarts){
+            if (hcRestarts) {
                 $('#iteration-section').show();
                 $('#iteration-count').text(idx + 1);
             }
@@ -147,7 +161,7 @@
                     }
                     else {
                         highlightTour(data.tours[tourIndex], null); // Initial tour highlight
-                        
+
                         history.tours.push(data.tours[tourIndex])
                         history.distances.push(data.distances[tourIndex])
                         history.swappedNodes.push(null)
@@ -156,16 +170,16 @@
                         await waitOneSecond(); // Wait for 1 second
 
                         highlightTour(data.tours[tourIndex], data.swapped_nodes_list[tourIndex] || []); // Highlight swapped nodes
-                        
+
                         history.tours.push(data.tours[tourIndex])
                         history.distances.push(data.distances[tourIndex])
                         history.swappedNodes.push(data.swapped_nodes_list[tourIndex] || null)
-                        
+
                         tourIndex++;
                         setTimeout(() => displayNextTour(data, tourIndex), 1000);
                     }
                 }
-                else{
+                else {
                     if (hcRestarts == true) {
                         $('#iteration-section').hide();
                         highlightTour(data.tours[tourIndex], null, '#E64E00');
@@ -215,16 +229,16 @@
             $('#next-button').click(function () {
                 if (currentPlotIndex < data.plot_files.length - 1) {
                     currentPlotIndex++;
-                    if (currentPlotIndex == data.plot_files.length - 1){
+                    if (currentPlotIndex == data.plot_files.length - 1) {
                         $('#iteration-section').hide();
                         displayHistory(data, currentPlotIndex, false, '#E64E00');
                     }
-                    else{
+                    else {
                         displayHistory(data, currentPlotIndex, hcRestarts);
                     }
                     $('#prev-button').prop('disabled', false);
                 }
-                if (currentPlotIndex == data.plot_files.length - 1){
+                if (currentPlotIndex == data.plot_files.length - 1) {
                     $('#next-button').prop('disabled', true);
                 }
 
@@ -237,7 +251,12 @@
 
         $(document).ready(function () {
             let plotFiles;
-
+            $('ul#simple-menu li a').on('click', function(e) {
+                e.preventDefault();
+                $('ul#simple-menu li a').removeClass('current');
+                $(this).addClass('current');
+                window.location.href = $(this).attr('href');
+            });
             $('input[name="location"]').change(function () {
                 if (this.value === 'predefined') {
                     $('#predefined-options').show();

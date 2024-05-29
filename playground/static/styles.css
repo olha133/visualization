@@ -1,120 +1,244 @@
-/* body {
-    margin: 0;
-    padding: 0;
-    height: 50vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+body {
+  font-family: Arial, sans-serif;
+}
+
+.tooltiptext {
+  visibility: hidden;
+  width: 250px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -125px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltiptext::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+.container {
+  display: flex;
+}
+
+.sidebar {
+  width: 30%;
+  padding: 20px;
+  border-right: 1px solid #ccc;
+}
+
+.visualization {
+  width: 70%;
+  padding: 20px;
+}
+
+.description,
+.tsp-parameters,
+.algorithm-parameters,
+.navigation {
+  margin-bottom: 20px;
+}
+
+.navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 #plots {
-    width: 600px; 
-    height: 500px;
-    overflow: hidden;
-    position: relative;
+  width: 400px;
+  height: 300px;
+  overflow: hidden;
+  position: relative;
 }
 
 .rotating {
-    position: relative;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    width: 100%;
-    height: 100%;
+  position: relative;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .rotating .image {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-} */
-#plots {
-    width: 600px;
-    height: 500px;
-    overflow: hidden;
-    position: relative;
-}
-
-.rotating {
-    position: relative;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    width: 100%;
-    height: 100%;
-}
-
-.rotating .image {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
 }
 
 @keyframes rotate {
-    0% {
-        opacity: 1;
-    }
+  0% {
+    opacity: 1;
+  }
 
-    100% {
-        opacity: 1;
-    }
+  100% {
+    opacity: 1;
+  }
 }
 
 .plot-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-/* Tooltip container */
 .tooltip {
-    position: relative;
-    display: inline-block;
-    cursor: pointer;
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
 }
 
-/* Tooltip text */
 .tooltip .tooltiptext {
-    visibility: hidden;
-    width: 200px;
-    background-color: #555;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px;
-    position: absolute;
-    z-index: 1;
-    bottom: 125%;
-    /* Position the tooltip above the text */
-    left: 50%;
-    margin-left: -100px;
-    opacity: 0;
-    transition: opacity 0.3s;
+  visibility: hidden;
+  width: 150px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -75px;
+  opacity: 0;
+  transition: opacity 0.3s;
 }
 
-/* Tooltip arrow */
-.tooltip .tooltiptext::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: #555 transparent transparent transparent;
-}
-
-/* Show the tooltip text when you hover over the tooltip container */
 .tooltip:hover .tooltiptext {
-    visibility: visible;
-    opacity: 1;
+  visibility: visible;
+  opacity: 1;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 20px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 12px;
+  width: 12px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked+.slider {
+  background-color: #2196F3;
+}
+
+input:checked+.slider:before {
+  transform: translateX(14px);
 }
 
 #waiting-message {
-    display: none;
-    color: blue;
-    font-size: 16px;
-    margin-top: 10px;
+  display: none;
+  color: blue;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #CCCCCC;
+  height: 1px;
+  margin-bottom: 15px;
+}
+
+#demo-container {
+  padding: 10px 15px 0 15px;
+  background: #3E5CC5;
+  border-radius: 3px;
+}
+
+ul#simple-menu {
+  list-style-type: none;
+  width: 100%;
+  position: relative;
+  height: 27px;
+  font-family: "Trebuchet MS", Arial, sans-serif;
+  font-size: 13px;
+  font-weight: bold;
+  margin: 0;
+  padding: 11px 0 0 0;
+}
+
+ul#simple-menu li {
+  display: block;
+  float: left;
+  margin: 0 0 0 4px;
+  height: 27px;
+}
+
+ul#simple-menu li.left {
+  margin: 0;
+}
+
+ul#simple-menu li a {
+  display: block;
+  float: left;
+  color: #fff;
+  background: #3E5CC5;
+  line-height: 27px;
+  text-decoration: none;
+  padding: 0 17px 0 18px;
+  height: 27px;
+  border-radius: 3px;
+}
+
+ul#simple-menu li a.right {
+  padding-right: 19px;
+}
+
+ul#simple-menu li a:hover {
+  background: #5277ff;
+}
+
+ul#simple-menu li a.current {
+  color: #5277ff;
+  background: #fff;
+}
+
+ul#simple-menu li a.current:hover {
+  color: #3E5CC5;
+  background: #fff;
 }
