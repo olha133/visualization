@@ -1,9 +1,9 @@
 {% extends 'playground\main_hc.html' %}
 {% load static %}
 {% block additional_content %}
-<div class="algorithm-parameters" id="iteration-slider">
-    <h3>Algorithm Parameters</h3>
-    <label for="iterations">Number of iterations:</label>
+<div class="algorithm-parameters" id="section">
+    <h3 class="blue-bottom">Algorithm Parameters</h3>
+    <label for="iterations">Number of runs:</label>
     <input type="range" id="iterations" name="iterations" min="1" max="100" value="1"
         oninput="this.nextElementSibling.value = this.value">
     <output>1</output>

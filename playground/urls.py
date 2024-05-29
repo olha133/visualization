@@ -4,6 +4,6 @@ from . import views
 # URLconf
 urlpatterns = [
     path("", views.hc, name="hc"),
-    path("hc_restarts/", views.hc_restarts, name="hc_restarts"),
-    path("hc_larger_radii/", views.hc_larger_radii, name="hc_larger_radii"),
+    path("hc_restarts", views.hc_restarts, name="hc_restarts"),
+    path("hc_larger_radii", views.hc_larger_radii, name="hc_larger_radii"),
 ]

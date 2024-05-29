@@ -7,34 +7,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Algorithm visualization</title>
     <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://kit.fontawesome.com/56051789c3.js" crossorigin="anonymous"></script>
+    <script defer src="{% static 'js/activePage.js' %}""></script>
 </head>
 
 <body>
-    <hr />
-    <div id="demo-container">
-        <ul id="simple-menu">
-            <li><a href="/" class="current"><span>Hill climbing</span></a></li>
-            <li><a href="/hc_restarts"><span>Hill climbing with restarts</span></a></li>
-            <li><a href="/hc_larger_radii"><span>Hill climbing with larger search radii</span></a></li>
-        </ul>
+    <div id=" demo-container">
+        <nav>
+            <ul id="simple-menu">
+                <li><a href="/"><span>Hill climbing</span></a></li>
+                <li><a href="/hc_restarts"><span>Hill climbing with restarts</span></a></li>
+                <li><a href="/hc_larger_radii"><span>Hill climbing with larger search radii</span></a></li>
+            </ul>
+        </nav>
     </div>
 
     <div class="container">
-        <div class="sidebar">
-            <div class="description">
-                <h3>About this Site</h3>
-                <p>This site allows you to visualize different variations of the Hill Climbing algorithm applied to the
-                    Traveling Salesman Problem.</p>
+        <div class="sidebar-left">
+            <div class="description" id="section">
+                <h3>Visualizer for optimization algorithms</h3>
+                <p>This site allows you to visualize the Hill Climbing algorithm
+                    and techniques for Escaping Local Optima applied to the Traveling Salesman Problem.</p>
             </div>
 
-            <div class="tsp-parameters">
-                <h3>TSP Parameters</h3>
-                <input type="radio" id="predefined" name="location" value="predefined" checked>
-                <label for="predefined">Pre-defined Map</label>
-                <input type="radio" id="custom" name="location" value="custom">
-                <label for="custom">Custom Map</label>
+            <div class="tsp-parameters" id="section">
+                <h3 class="blue-bottom">TSP Parameters</h3>
+                <h4 class="maps">Map</h4>
+                <input type="radio" id="predefined" name="location" value="predefined" class="option-input" checked>
+                <label for="predefined" class="option-label" id="pre-def">PRE-DEFINED</label>
+                <input type="radio" id="custom" name="location" value="custom" class="option-input">
+                <label for="custom" class="option-label id="custom">CUSTOM</label>
 
                 <div class="tooltip">
                     <i class="fa-solid fa-circle-info" alt="Info" style="width: 16px; height: 16px;"></i>
@@ -46,47 +53,61 @@
                         ...</code>
                     </span>
                 </div>
-
+                
                 <div id="predefined-options">
                     <label>City count:</label>
-                    <input type="radio" name="city-count" value="5"> 5 cities
-                    <input type="radio" name="city-count" value="10"> 10 cities
-                    <input type="radio" name="city-count" value="15"> 15 cities
-                    <input type="radio" name="city-count" value="20"> 20 cities
+                    <div class="option">
+                        <input type="radio" name="city-count" value="5">
+                        <label for="predefined">5 cities</label>
+                        <input type="radio" name="city-count" value="10">
+                        <label for="predefined">10 cities</label>
+                        <input type="radio" name="city-count" value="15">
+                        <label for="predefined">15 cities</label>
+                        <input type="radio" name="city-count" value="20">
+                        <label for="predefined">20 cities</label>
+                    </div>
                 </div>
 
                 <div id="custom-options" style="display: none;">
                     <label for="myfile">Select a file:</label>
                     <input type="file" id="custom-file" name="custom_file" accept=".csv, text/csv" />
                 </div>
-                <label class="switch">
-                    <input type="checkbox" id="weighted" name="weighted">
-                    <span class="slider round"></span>
-                    Display Weights on Graph
-                </label>
+                <div class="switch-container">
+                    <label class="switch">
+                        <input type="checkbox" id="weighted" name="weighted">
+                        <span class="slider round"></span>
+                    </label>
+                    <label for="weighted" id="weights">Display weights on graph</label>
+                </div>
+                
             </div>
             {% block additional_content %}
             {% endblock %}
             <div id="error-message" style="color: red; display: none;"></div>
-            <div id="navigation-buttons">
-                <button id="prev-button" disabled><i class="fa-solid fa-backward"></i></button>
-                <button id="next-button" disabled><i class="fa-solid fa-forward"></i></button>
-                <button id="replay-button" disabled><i class="fa-solid fa-repeat"></i></button>
-                <button id="start-button"><i class="fa-solid fa-play"></i></button>
-                <div id="waiting-message">Please wait while the visualization is being generated...</div>
+            <div class="button-container" id="section">
+                <h3 class="blue-bottom">Controls</h3>
+                <button class="nav-button" id="prev-button" disabled><i class="fa-solid fa-backward"></i></button>
+                <button class="nav-button" id="next-button" disabled><i class="fa-solid fa-forward"></i></button>
+                <button class="nav-button" id="replay-button" disabled><i class="fa-solid fa-repeat"></i></button>
+                <button class="nav-button" id="start-button"><i class="fa-solid fa-play"></i></button>
             </div>
+            <div id="waiting-message">Please wait while the visualization is being generated...</div>
         </div>
         <div class="visualization" id="visualization">
             <div id="result" style="display: none;">
-                <h2 id="iteration-section" style="display: none;">Iteration: <span id="iteration-count">0</span></h2>
-                <!-- Initially hidden -->
-                <h2>Tour: <span id="tours"></span></h2>
-                <h2>Distance: <span id="distances"></span></h2>
-                <h2>Time: <span id="elapsed-time"></span></h2>
                 <div id="plots">
                     <ul class="rotating">
                         <!-- Plots will be dynamically added here -->
                     </ul>
+                </div>
+                <div class="sidebar-right">
+                    <div class="info-results" id="section">
+                        <h2 id="iteration-section" style="display: none;">Iteration: <span id="iteration-count">0</span></h2>
+                        <!-- Initially hidden -->
+                        <h2>Tour: <span id="tours"></span></h2>
+                        <h2>Distance: <span id="distances"></span></h2>
+                        <h2>Time: <span id="elapsed-time"></span></h2>
+                    </div>
                 </div>
             </div>
         </div>
@@ -96,7 +117,6 @@
             tours: [],
             distances: [],
             swappedNodes: [],
-            // currentStep: 0
         };
         function waitOneSecond() {
             return new Promise(resolve => setTimeout(resolve, 1000));
@@ -120,6 +140,12 @@
         }
 
         function startVisualization(data) {
+            $('#start-button').prop('disabled', true);
+            history = {
+                tours: [],
+                distances: [],
+                swappedNodes: [],
+            };
             let hcRestarts = false;
             if (data.swapped_nodes_list == null) {
                 hcRestarts = true;
@@ -210,6 +236,7 @@
                     // Enable navigation buttons
                     $('#prev-button').prop('disabled', false);
                     $('#replay-button').prop('disabled', false);
+                    $('#start-button').prop('disabled', false);
                 }
             }
 
@@ -251,12 +278,6 @@
 
         $(document).ready(function () {
             let plotFiles;
-            $('ul#simple-menu li a').on('click', function(e) {
-                e.preventDefault();
-                $('ul#simple-menu li a').removeClass('current');
-                $(this).addClass('current');
-                window.location.href = $(this).attr('href');
-            });
             $('input[name="location"]').change(function () {
                 if (this.value === 'predefined') {
                     $('#predefined-options').show();
@@ -281,6 +302,6 @@
         });
     </script>
     {% block extra_js %}{% endblock %}
-</body>
+    </body>
 
 </html>

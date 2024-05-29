@@ -1,5 +1,8 @@
 body {
-  font-family: Arial, sans-serif;
+  font-family: "Raleway", sans-serif;
+  /* font-optical-sizing: auto; */
+  /* font-style: normal; */
+  /* font-weight: 500; */
 }
 
 .tooltiptext {
@@ -32,24 +35,55 @@ body {
 
 .container {
   display: flex;
+  margin: 0;
+  padding: 0;
+  width: 100%;
 }
 
-.sidebar {
-  width: 30%;
-  padding: 20px;
+.sidebar-left {
+  width: 23.2%;
+  padding-top: 10px;
+  padding-right: 10px;
   border-right: 1px solid #ccc;
+  box-sizing: border-box;
+
 }
+
+.sidebar-right {
+  padding-top: 10px;
+  padding-right: 10px;
+  border-right: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+.info-results {
+  position: absolute;
+  top: 10px;
+  right: 0;
+  padding-top: 10px;
+  padding-left: 10px;
+  border-right: 1px solid #ccc;
+  box-sizing: border-box;
+  font-size: 12px;
+  font-weight: 500;
+}
+
 
 .visualization {
-  width: 70%;
+  width: 80%;
   padding: 20px;
+  box-sizing: border-box;
+}
+
+#visualization {
+  position: relative;
 }
 
 .description,
 .tsp-parameters,
 .algorithm-parameters,
 .navigation {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .navigation {
@@ -59,8 +93,8 @@ body {
 }
 
 #plots {
-  width: 400px;
-  height: 300px;
+  width: 700px;
+  height: 600px;
   overflow: hidden;
   position: relative;
 }
@@ -130,6 +164,8 @@ body {
   display: inline-block;
   width: 34px;
   height: 20px;
+  margin-left: 5px;
+  margin-top: 7px;
 }
 
 .switch input {
@@ -163,7 +199,7 @@ body {
 }
 
 input:checked+.slider {
-  background-color: #2196F3;
+  background-color: #5277ff;
 }
 
 input:checked+.slider:before {
@@ -177,68 +213,125 @@ input:checked+.slider:before {
   margin-top: 10px;
 }
 
-hr {
-  border: none;
-  border-top: 1px solid #CCCCCC;
-  height: 1px;
-  margin-bottom: 15px;
+#demo-container {
+  padding: 10px;
+  background: #FFFFFF;
+  /* Change to white or other desired light color */
+  border: solid 1px #bbbbbb;
+  /* Add light grey border */
+  font-weight: bold;
+  border-radius: 10px;
 }
 
-#demo-container {
-  padding: 10px 15px 0 15px;
-  background: #3E5CC5;
-  border-radius: 3px;
+#section {
+  padding: 10px;
+  padding-top: 3px;
+  background: #FFFFFF;
+  /* Change to white or other desired light color */
+  border: solid 1px #bbbbbb;
+  border-radius: 10px;
+}
+
+.description {
+  font-size: 13.5px;
+}
+
+.tsp-parameters {
+  font-size: 16px;
+}
+
+.blue-bottom {
+  border-bottom: solid #5277ff;
 }
 
 ul#simple-menu {
   list-style-type: none;
-  width: 100%;
-  position: relative;
-  height: 27px;
-  font-family: "Trebuchet MS", Arial, sans-serif;
-  font-size: 13px;
-  font-weight: bold;
   margin: 0;
-  padding: 11px 0 0 0;
+  padding: 1px;
+  border-bottom: solid 1px #bbbbbb;
 }
 
 ul#simple-menu li {
-  display: block;
-  float: left;
-  margin: 0 0 0 4px;
-  height: 27px;
-}
-
-ul#simple-menu li.left {
-  margin: 0;
+  display: inline-block;
+  /* Change from block to inline-block */
 }
 
 ul#simple-menu li a {
   display: block;
-  float: left;
-  color: #fff;
-  background: #3E5CC5;
-  line-height: 27px;
-  text-decoration: none;
-  padding: 0 17px 0 18px;
-  height: 27px;
+  padding: .5em .75em;
+  /* Adjust padding as needed */
+  color: #000000;
+  /* Change text color to black or other dark color */
+  background-color: #F8F8F8;
+  border-style: solid;
+  border: solid 1px #bbbbbb;
   border-radius: 3px;
+  /* Light grey background for each tab */
+  text-decoration: none;
+  font-weight: bold;
 }
 
-ul#simple-menu li a.right {
-  padding-right: 19px;
-}
-
-ul#simple-menu li a:hover {
-  background: #5277ff;
-}
-
+ul#simple-menu li a:hover,
 ul#simple-menu li a.current {
-  color: #5277ff;
-  background: #fff;
+  background-color: #E9E9E9;
+  /* Slightly darker grey on hover/active */
+  border-bottom: solid #5277ff;
+  /* Blue bottom border on hover/active */
 }
 
-ul#simple-menu li a.current:hover {
-  color: #3E5CC5;
-  background: #fff;
+.option-input {
+  display: none; /* Hide the default radio button */
+}
+
+.option-label {
+  padding: 5px 10px;
+  /* margin: 5px; */
+  cursor: pointer;
+  background-color: #ccc; /* Default background color */
+  border-radius: 5px;
+  font-size: smaller;
+  font-weight: 500;
+}
+#pre-def{
+  margin-left: 5px;
+}
+#predefined-options, #custom-options{
+  margin: 10px;
+}
+.option-input:checked + .option-label {
+  background-color: #5277ff; /* Background color when selected */
+  color: white; /* Text color when selected */
+}
+.maps{
+  margin: 8px;
+}
+#predefined-options {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start	;
+}
+
+.option {
+  width: 60%; /* Adjust as needed */
+}
+
+.button-container {
+  padding: 10px;
+}
+
+.nav-button {
+  border: none;
+  padding: 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  transition-duration: 0.4s;
+  cursor: pointer;
+}
+
+.nav-button:not(:disabled):hover  {
+  background-color: #5277ff; 
+  color: white;
 }
