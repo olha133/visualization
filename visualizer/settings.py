@@ -57,7 +57,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "storefront.urls"
+ROOT_URLCONF = "visualizer.urls"
 
 TEMPLATES = [
     {
@@ -79,7 +79,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "storefront.wsgi.application"
+WSGI_APPLICATION = "visualizer.wsgi.application"
 
 
 # Database

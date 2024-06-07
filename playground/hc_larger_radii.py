@@ -12,8 +12,7 @@ matplotlib.use('Agg')
 
 
 class HillClimbingLargerRadii:
-    def __init__(self, num_cities=5, csv_file=None, weighted=False):
-        self.num_cities = num_cities
+    def __init__(self, csv_file=None, weighted=False):
         self.csv_file = csv_file
         self.positions, self.distance_matrix = self.generate_distance_matrix()
         self.random_seed = int(time.time())
@@ -30,8 +29,7 @@ class HillClimbingLargerRadii:
             distance_matrix = squareform(pdist(positions, 'euclidean'))
             self.num_cities = len(distance_matrix)
         else:
-            positions = np.random.rand(self.num_cities, 2)
-            distance_matrix = squareform(pdist(positions, 'euclidean'))
+            return None
         return positions, distance_matrix
 
     def total_distance(self, tour):
