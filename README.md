@@ -40,10 +40,6 @@ https://github.com/user-attachments/assets/1e1adb4a-280f-4f48-9f4f-c1fd9564cf8c
 
 https://github.com/user-attachments/assets/1b57eb79-ab6e-4903-bdbe-b86639953003
 
-## Evaluation
-
-
-
 ## Contribution
 
 This project is intended as a **teaching tool** for:
